@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Materiais — StudyHelp</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="sh-navbar">
+  <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <a href="index.html" class="sh-logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 6C10 4.5 6.5 4 3 4v13c3.5 0 7 .5 9 2 2-1.5 5.5-2 9-2V4c-3.5 0-7 .5-9 2Z" fill="#2E7D32"/></svg>
+      StudyHelp
+    </a>
+    <div class="d-none d-lg-flex gap-1">
+      <a href="aluno.html" class="sh-nav-link">Início</a>
+      <a href="materiais.html" class="sh-nav-link active">Matérias</a>
+      <a href="tutores.html" class="sh-nav-link">Tutores</a>
+    </div>
+    <div class="dropdown">
+      <div class="d-flex align-items-center gap-2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="https://i.pravatar.cc/80?img=47" class="sh-avatar sh-user-avatar" style="width:36px;height:36px">
+        <span style="font-size:.9rem">Olá, <span class="sh-user-firstname">Ana</span></span>
+        <i class="bi bi-chevron-down sh-muted" style="font-size:.75rem"></i>
+      </div>
+      <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2" style="border-radius:12px;border-color:var(--sh-border)">
+        <li><a class="dropdown-item" href="perfil.html"><i class="bi bi-person me-2"></i>Meu perfil</a></li>
+        <li><a class="dropdown-item" href="perfil.html#config"><i class="bi bi-gear me-2"></i>Configurações</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-danger" href="index.html" onclick="shLogout()"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-4">
+  <h1 class="h4 mb-1">Materiais de apoio</h1>
+  <p class="sh-muted mb-3">Vídeos, PDFs, exercícios e resumos publicados pelos tutores.</p>
+
+  <div class="d-flex gap-2 flex-wrap mb-4">
+    <input id="busca-material" class="form-control sh-search" style="max-width:320px" placeholder="Pesquisar materiais...">
+    <select id="filtro-materia" class="form-select sh-search" style="max-width:180px">
+      <option value="todas">Todas as matérias</option>
+      <option value="Matemática">Matemática</option>
+      <option value="Português">Português</option>
+      <option value="Ciências">Ciências</option>
+      <option value="História">História</option>
+      <option value="Inglês">Inglês</option>
+    </select>
+    <div class="btn-group" id="filtro-tipo">
+      <button class="btn btn-sh-outline btn-sm active" data-tipo="todos">Todos</button>
+      <button class="btn btn-sh-outline btn-sm" data-tipo="Vídeo"><i class="bi bi-play-btn"></i> Vídeo</button>
+      <button class="btn btn-sh-outline btn-sm" data-tipo="PDF"><i class="bi bi-file-earmark-pdf"></i> PDF</button>
+      <button class="btn btn-sh-outline btn-sm" data-tipo="Exercício"><i class="bi bi-pencil-square"></i> Exercício</button>
+      <button class="btn btn-sh-outline btn-sm" data-tipo="Resumo"><i class="bi bi-card-text"></i> Resumo</button>
+    </div>
+  </div>
+
+  <div class="row g-3" id="lista-materiais">
+    <div class="col-md-6 col-lg-4 material-item" data-materia="Matemática" data-tipo="Vídeo" data-titulo="funções do 1º grau">
+      <div class="sh-card p-3 h-100">
+        <div class="d-flex justify-content-between mb-2">
+          <span class="sh-pill purple"><i class="bi bi-play-btn-fill"></i> Vídeo</span>
+          <span class="sh-muted" style="font-size:.78rem">22/05/2026</span>
+        </div>
+        <div class="fw-semibold mb-1">Funções do 1º grau</div>
+        <div class="sh-muted mb-2" style="font-size:.85rem">Matemática · Prof. Lucas Oliveira</div>
+        <p class="sh-muted" style="font-size:.83rem">Explico como identificar e resolver funções do 1º grau passo a passo.</p>
+        <button class="btn btn-sh-outline btn-sm w-100 btn-acessar"
+          data-titulo="Funções do 1º grau" data-materia="Matemática" data-autor="Prof. Lucas Oliveira"
+          data-tipo="Vídeo" data-desc="Explico como identificar e resolver funções do 1º grau passo a passo.">Acessar</button>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-4 material-item" data-materia="Ciências" data-tipo="PDF" data-titulo="leis de newton">
+      <div class="sh-card p-3 h-100">
+        <div class="d-flex justify-content-between mb-2">
+          <span class="sh-pill gray"><i class="bi bi-file-earmark-pdf-fill"></i> PDF</span>
+          <span class="sh-muted" style="font-size:.78rem">20/05/2026</span>
+        </div>
+        <div class="fw-semibold mb-1">Leis de Newton</div>
+        <div class="sh-muted mb-2" style="font-size:.85rem">Ciências · Prof. Carla Menezes</div>
+        <p class="sh-muted" style="font-size:.83rem">Resumo completo com exemplos práticos das três leis de Newton.</p>
+        <button class="btn btn-sh-outline btn-sm w-100 btn-acessar"
+          data-titulo="Leis de Newton" data-materia="Ciências" data-autor="Prof. Carla Menezes"
+          data-tipo="PDF" data-desc="Resumo completo com exemplos práticos das três leis de Newton.">Acessar</button>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-4 material-item" data-materia="Ciências" data-tipo="Exercício" data-titulo="reações químicas">
+      <div class="sh-card p-3 h-100">
+        <div class="d-flex justify-content-between mb-2">
+          <span class="sh-pill"><i class="bi bi-pencil-square"></i> Exercício</span>
+          <span class="sh-muted" style="font-size:.78rem">19/05/2026</span>
+        </div>
+        <div class="fw-semibold mb-1">Reações químicas</div>
+        <div class="sh-muted mb-2" style="font-size:.85rem">Ciências · Prof. Carla Menezes</div>
+        <p class="sh-muted" style="font-size:.83rem">Lista com 10 exercícios sobre balanceamento de equações.</p>
+        <button class="btn btn-sh-outline btn-sm w-100 btn-acessar"
+          data-titulo="Reações químicas" data-materia="Ciências" data-autor="Prof. Carla Menezes"
+          data-tipo="Exercício" data-desc="Lista com 10 exercícios sobre balanceamento de equações.">Acessar</button>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-4 material-item" data-materia="Português" data-tipo="Resumo" data-titulo="figuras de linguagem">
+      <div class="sh-card p-3 h-100">
+        <div class="d-flex justify-content-between mb-2">
+          <span class="sh-pill purple"><i class="bi bi-card-text"></i> Resumo</span>
+          <span class="sh-muted" style="font-size:.78rem">18/05/2026</span>
+        </div>
+        <div class="fw-semibold mb-1">Figuras de linguagem</div>
+        <div class="sh-muted mb-2" style="font-size:.85rem">Português · Prof. Juliana Santos</div>
+        <p class="sh-muted" style="font-size:.83rem">Metáfora, metonímia, hipérbole e outras figuras explicadas com exemplos.</p>
+        <button class="btn btn-sh-outline btn-sm w-100 btn-acessar"
+          data-titulo="Figuras de linguagem" data-materia="Português" data-autor="Prof. Juliana Santos"
+          data-tipo="Resumo" data-desc="Metáfora, metonímia, hipérbole e outras figuras explicadas com exemplos.">Acessar</button>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-4 material-item" data-materia="História" data-tipo="PDF" data-titulo="revolução francesa">
+      <div class="sh-card p-3 h-100">
+        <div class="d-flex justify-content-between mb-2">
+          <span class="sh-pill gray"><i class="bi bi-file-earmark-pdf-fill"></i> PDF</span>
+          <span class="sh-muted" style="font-size:.78rem">17/05/2026</span>
+        </div>
+        <div class="fw-semibold mb-1">Revolução Francesa</div>
+        <div class="sh-muted mb-2" style="font-size:.85rem">História · Prof. Rodrigo Alves</div>
+        <p class="sh-muted" style="font-size:.83rem">Contexto, causas e consequências da Era das Revoluções.</p>
+        <button class="btn btn-sh-outline btn-sm w-100 btn-acessar"
+          data-titulo="Revolução Francesa" data-materia="História" data-autor="Prof. Rodrigo Alves"
+          data-tipo="PDF" data-desc="Contexto, causas e consequências da Era das Revoluções.">Acessar</button>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-4 material-item" data-materia="Inglês" data-tipo="Vídeo" data-titulo="verbos irregulares em inglês">
+      <div class="sh-card p-3 h-100">
+        <div class="d-flex justify-content-between mb-2">
+          <span class="sh-pill purple"><i class="bi bi-play-btn-fill"></i> Vídeo</span>
+          <span class="sh-muted" style="font-size:.78rem">15/05/2026</span>
+        </div>
+        <div class="fw-semibold mb-1">Verbos irregulares em inglês</div>
+        <div class="sh-muted mb-2" style="font-size:.85rem">Inglês · Prof. Fernanda Lopes</div>
+        <p class="sh-muted" style="font-size:.83rem">Videoaula com os verbos irregulares mais cobrados em provas.</p>
+        <button class="btn btn-sh-outline btn-sm w-100 btn-acessar"
+          data-titulo="Verbos irregulares em inglês" data-materia="Inglês" data-autor="Prof. Fernanda Lopes"
+          data-tipo="Vídeo" data-desc="Videoaula com os verbos irregulares mais cobrados em provas.">Acessar</button>
+      </div>
+    </div>
+  </div>
+
+  <p id="msg-vazio" class="sh-muted text-center py-5 d-none">Nenhum material encontrado com esse filtro.</p>
+</div>
+
+<!-- MODAL DE VISUALIZAÇÃO DO MATERIAL -->
+<div class="modal fade" id="modalMaterial" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:14px">
+      <div class="modal-header">
+        <h5 class="modal-title" id="mm-titulo">Título</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <span class="sh-pill purple" id="mm-tipo">Tipo</span>
+          <span class="sh-muted" id="mm-materia" style="font-size:.85rem">Matéria</span>
+          <span class="sh-muted" style="font-size:.85rem">·</span>
+          <span class="sh-muted" id="mm-autor" style="font-size:.85rem">Autor</span>
+        </div>
+        <p class="sh-muted" id="mm-desc" style="font-size:.9rem">Descrição</p>
+        <div class="sh-card p-4 text-center" style="background:#F7FAF6">
+          <i class="bi bi-file-earmark-text fs-1" style="color:var(--sh-green-dark)"></i>
+          <p class="sh-muted mt-2 mb-0" style="font-size:.82rem">Este é um protótipo — aqui entraria o vídeo, PDF ou exercício de verdade, vindo do servidor.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-sh-outline btn-sm" data-bs-dismiss="modal">Fechar</button>
+        <button class="btn btn-sh-primary btn-sm" onclick="alert('Download simulado — o arquivo real virá do backend.')">Baixar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="sh-footer mt-5">
+  <div class="container text-center">© 2026 StudyHelp. Todos os direitos reservados.</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+<script>shExigirLogin();</script>
+<script>
+  const busca = document.getElementById('busca-material');
+  const filtroMateria = document.getElementById('filtro-materia');
+  const botoesTipo = document.querySelectorAll('#filtro-tipo button');
+  const itens = document.querySelectorAll('.material-item');
+  let tipoAtivo = 'todos';
+
+  function aplicarFiltros() {
+    const termo = busca.value.trim().toLowerCase();
+    const materia = filtroMateria.value;
+    let visiveis = 0;
+
+    itens.forEach(item => {
+      const bateMateria = materia === 'todas' || item.dataset.materia === materia;
+      const bateTipo = tipoAtivo === 'todos' || item.dataset.tipo === tipoAtivo;
+      const bateBusca = !termo || item.dataset.titulo.includes(termo) || item.dataset.materia.toLowerCase().includes(termo);
+      const mostra = bateMateria && bateTipo && bateBusca;
+      item.classList.toggle('d-none', !mostra);
+      if (mostra) visiveis++;
+    });
+
+    document.getElementById('msg-vazio').classList.toggle('d-none', visiveis > 0);
+  }
+
+  busca.addEventListener('input', aplicarFiltros);
+  filtroMateria.addEventListener('change', aplicarFiltros);
+  botoesTipo.forEach(btn => {
+    btn.addEventListener('click', function () {
+      botoesTipo.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      tipoAtivo = this.dataset.tipo;
+      aplicarFiltros();
+    });
+  });
+
+  // Botão "Acessar" abre o material num modal (simulação — sem backend ainda)
+  document.querySelectorAll('.btn-acessar').forEach(btn => {
+    btn.addEventListener('click', function () {
+      document.getElementById('mm-titulo').textContent = this.dataset.titulo;
+      document.getElementById('mm-tipo').textContent = this.dataset.tipo;
+      document.getElementById('mm-materia').textContent = this.dataset.materia;
+      document.getElementById('mm-autor').textContent = this.dataset.autor;
+      document.getElementById('mm-desc').textContent = this.dataset.desc;
+      new bootstrap.Modal(document.getElementById('modalMaterial')).show();
+    });
+  });
+</script>
+</body>
+</html>
