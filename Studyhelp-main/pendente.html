@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aguardando aprovação — StudyHelp</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container py-4">
+  <a href="index.html" class="sh-nav-link"><i class="bi bi-arrow-left"></i> Voltar para o início</a>
+</div>
+
+<div class="container pb-5" style="max-width:560px">
+  <div class="sh-card p-4 p-md-5 text-center">
+    <div class="sh-icon-badge purple mx-auto mb-3" style="width:64px;height:64px;font-size:1.6rem"><i class="bi bi-hourglass-split"></i></div>
+    <h1 class="h4 mb-2">Cadastro em análise</h1>
+    <p class="sh-muted mb-1">Olá, <span class="sh-user-fullname fw-semibold">Professor(a)</span>! Recebemos seu cadastro como tutor.</p>
+    <p class="sh-muted mb-4">Por segurança, todo novo tutor passa por uma aprovação do administrador da plataforma antes de poder publicar matérias e conteúdos. Você recebe um email assim que for liberado.</p>
+    <span class="sh-pill warn mb-4 d-inline-block">Status: Pendente de aprovação</span>
+
+    <hr>
+
+    <div class="text-start sh-muted" style="font-size:.85rem">
+      <div class="mb-2"><i class="bi bi-1-circle-fill me-1" style="color:var(--sh-green-dark)"></i> Seu cadastro foi enviado ao administrador.</div>
+      <div class="mb-2"><i class="bi bi-2-circle-fill me-1" style="color:var(--sh-green-dark)"></i> O administrador confere seus dados na área de Solicitações.</div>
+      <div class="mb-0"><i class="bi bi-3-circle-fill me-1" style="color:var(--sh-green-dark)"></i> Assim que aprovado, seu painel de professor é liberado.</div>
+    </div>
+
+    <hr>
+
+    <p class="sh-muted mb-2" style="font-size:.8rem">Este protótipo não tem backend ainda, então simule a aprovação abaixo pra ver como fica o painel do professor liberado:</p>
+    <button class="btn btn-sh-primary btn-sm" id="btn-simular-aprovacao">Simular aprovação do administrador</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+<script>shExigirLogin();</script>
+<script>
+  // Se por algum motivo o usuário já foi aprovado (ou não é tutor), manda direto pro painel certo
+  const u = shGetUser();
+  if (u.papel === 'Administrador') window.location.href = 'admin.html';
+  else if (u.papel === 'Aluno') window.location.href = 'aluno.html';
+  else if (u.papel === 'Tutor' && u.status === 'Aprovado') window.location.href = 'professor.html';
+
+  document.getElementById('btn-simular-aprovacao').addEventListener('click', function () {
+    const user = shGetUser();
+    user.status = 'Aprovado';
+    shSaveUser(user);
+    shRegistrarUsuarioNaBase(user.nome, user.email, 'Tutor', 'Aprovado');
+    shAdicionarAtividade(`${user.nome} foi aprovado(a) como tutor(a)`);
+    window.location.href = 'professor.html';
+  });
+</script>
+</body>
+</html>

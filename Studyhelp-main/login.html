@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar ou Cadastrar — StudyHelp</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container py-4">
+  <a href="index.html" class="sh-nav-link"><i class="bi bi-arrow-left"></i> Voltar para o início</a>
+</div>
+
+<div class="container pb-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+
+      <!-- LOGIN -->
+      <div class="sh-card p-4 p-md-5" id="painel-login">
+        <div class="sh-logo mb-4"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 6C10 4.5 6.5 4 3 4v13c3.5 0 7 .5 9 2 2-1.5 5.5-2 9-2V4c-3.5 0-7 .5-9 2Z" fill="#2E7D32"/></svg> StudyHelp</div>
+        <h1 class="h3 mb-1">Login</h1>
+        <p class="sh-muted mb-4">Entre na sua conta</p>
+        <form id="form-login">
+          <div class="mb-3">
+            <label class="form-label fw-semibold" style="font-size:.9rem">Email</label>
+            <input type="email" id="login-email" class="form-control sh-search" placeholder="seuemail@gmail.com" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label fw-semibold" style="font-size:.9rem">Senha</label>
+            <div class="input-group">
+              <input type="password" id="login-senha" class="form-control sh-search" placeholder="••••••••" required>
+              <span class="input-group-text sh-search" id="toggle-senha-login" style="cursor:pointer"><i class="bi bi-eye"></i></span>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold" style="font-size:.9rem">Entrar como</label>
+            <select id="login-papel" class="form-select sh-search">
+              <option value="Aluno">Aluno</option>
+              <option value="Tutor">Tutor</option>
+            </select>
+          </div>
+          <div class="text-end mb-3">
+            <a href="#" class="sh-muted" style="font-size:.85rem">Esqueci minha senha</a>
+          </div>
+          <div id="login-erro" class="text-danger d-none mb-3" style="font-size:.85rem"><i class="bi bi-exclamation-circle-fill"></i> Não encontramos uma conta com esse email. Cadastre-se primeiro.</div>
+          <button class="btn btn-sh-primary w-100" type="submit">Entrar</button>
+        </form>
+        <p class="text-center sh-muted mt-3" style="font-size:.9rem">Não tem uma conta? <a href="#" id="link-ir-cadastro" style="color:var(--sh-green-dark);font-weight:500">Cadastre-se</a></p>
+      </div>
+
+      <!-- CADASTRO -->
+      <div class="sh-card p-4 p-md-5 d-none" id="painel-cadastro">
+        <div class="sh-logo mb-4"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 6C10 4.5 6.5 4 3 4v13c3.5 0 7 .5 9 2 2-1.5 5.5-2 9-2V4c-3.5 0-7 .5-9 2Z" fill="#2E7D32"/></svg> StudyHelp</div>
+        <h1 class="h3 mb-1">Cadastro</h1>
+        <p class="sh-muted mb-4">Crie sua conta</p>
+        <form id="form-cadastro">
+          <div class="mb-3">
+            <label class="form-label fw-semibold" style="font-size:.9rem">Nome completo</label>
+            <input type="text" id="cadastro-nome" class="form-control sh-search" placeholder="Seu nome completo" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold" style="font-size:.9rem">Email</label>
+            <input type="email" id="cadastro-email" class="form-control sh-search" placeholder="seuemail@gmail.com" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold" style="font-size:.9rem">Eu sou</label>
+            <div class="d-flex gap-2">
+              <label class="sh-card px-3 py-2 flex-fill text-center" style="cursor:pointer">
+                <input class="form-check-input me-1" type="radio" name="papel" value="Aluno" checked> Aluno
+              </label>
+              <label class="sh-card px-3 py-2 flex-fill text-center" style="cursor:pointer">
+                <input class="form-check-input me-1" type="radio" name="papel" value="Tutor"> Tutor
+              </label>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold" style="font-size:.9rem">Foto de perfil <span class="sh-muted fw-normal">(opcional)</span></label>
+            <div class="d-flex align-items-center gap-2">
+              <img id="preview-foto-cadastro" src="https://i.pravatar.cc/100?img=68" class="sh-avatar">
+              <input type="file" id="cadastro-foto" accept="image/*" class="form-control sh-search">
+            </div>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label fw-semibold" style="font-size:.9rem">Senha</label>
+              <div class="input-group">
+                <input type="password" id="cadastro-senha" class="form-control sh-search" placeholder="Mínimo de 6 caracteres" required>
+                <span class="input-group-text sh-search" id="toggle-senha-cadastro" style="cursor:pointer"><i class="bi bi-eye"></i></span>
+              </div>
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold" style="font-size:.9rem">Confirmar senha</label>
+              <div class="input-group">
+                <input type="password" id="cadastro-confirmar-senha" class="form-control sh-search" placeholder="Repita sua senha" required>
+                <span class="input-group-text sh-search" id="toggle-senha-confirmar" style="cursor:pointer"><i class="bi bi-eye"></i></span>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-sh-primary w-100" type="submit">Cadastrar</button>
+        </form>
+        <p class="text-center sh-muted mt-3" style="font-size:.9rem">Já tem uma conta? <a href="#" id="link-ir-login" style="color:var(--sh-green-dark);font-weight:500">Faça login</a></p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="text-center pb-4">
+  <a href="admin-login.html" class="sh-muted" style="font-size:.78rem">Acesso administrativo</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+<script>
+  // ATENÇÃO: isto é só uma simulação de sessão no navegador (localStorage),
+  // pra demo do protótipo. Quando o backend em PHP/MySQL estiver pronto,
+  // troquem por login/cadastro reais no servidor.
+
+  // Alternar entre o cartão de Login e o de Cadastro
+  const painelLogin = document.getElementById('painel-login');
+  const painelCadastro = document.getElementById('painel-cadastro');
+
+  document.getElementById('link-ir-cadastro').addEventListener('click', function (e) {
+    e.preventDefault();
+    painelLogin.classList.add('d-none');
+    painelCadastro.classList.remove('d-none');
+  });
+  document.getElementById('link-ir-login').addEventListener('click', function (e) {
+    e.preventDefault();
+    painelCadastro.classList.add('d-none');
+    painelLogin.classList.remove('d-none');
+  });
+
+  // Se a pessoa clicou num botão "Cadastre-se" de outra página (login.html#cadastro), já abre direto nele
+  if (window.location.hash === '#cadastro') {
+    painelLogin.classList.add('d-none');
+    painelCadastro.classList.remove('d-none');
+  }
+
+  // Pré-visualização da foto escolhida no cadastro
+  let fotoCadastroBase64 = null;
+  document.getElementById('cadastro-foto').addEventListener('change', function () {
+    const arquivo = this.files[0];
+    if (!arquivo) return;
+    const leitor = new FileReader();
+    leitor.onload = function (ev) {
+      fotoCadastroBase64 = ev.target.result;
+      document.getElementById('preview-foto-cadastro').src = fotoCadastroBase64;
+    };
+    leitor.readAsDataURL(arquivo);
+  });
+
+  document.getElementById('form-cadastro').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const nome = document.getElementById('cadastro-nome').value || 'Aluno';
+    const email = document.getElementById('cadastro-email').value || '';
+    const papel = document.querySelector('input[name="papel"]:checked').value;
+    // Tutor precisa de aprovação do administrador antes de ter acesso completo
+    const status = papel === 'Tutor' ? 'Pendente' : 'Aprovado';
+    const usuario = { nome, email, papel, status };
+    if (fotoCadastroBase64) usuario.avatar = fotoCadastroBase64;
+
+    // Se alguém já estava logado neste navegador, encerra a sessão antes —
+    // senão o cadastro novo sobrescreveria a conta de quem estava ativo.
+    shLogout();
+    shSaveUser(usuario);
+
+    shAdicionarAtividade(papel === 'Tutor'
+      ? `${nome} solicitou cadastro como tutor(a)`
+      : `${nome} se cadastrou como ${papel.toLowerCase()}`);
+
+    window.location.href = shDestinoPainel({ papel, status });
+  });
+
+  document.getElementById('form-login').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value.trim();
+    const papel = document.getElementById('login-papel').value;
+    const erro = document.getElementById('login-erro');
+
+    const entrou = shFazerLogin(email, papel);
+    if (!entrou) {
+      erro.classList.remove('d-none');
+      return;
+    }
+    erro.classList.add('d-none');
+
+    const usuario = shGetUser();
+    window.location.href = shDestinoPainel(usuario);
+  });
+
+  // Olhinho de mostrar/esconder senha
+  function shLigarToggleSenha(idBotao, idCampo) {
+    const botao = document.getElementById(idBotao);
+    const campo = document.getElementById(idCampo);
+    if (!botao || !campo) return;
+    botao.addEventListener('click', function () {
+      const mostrando = campo.type === 'text';
+      campo.type = mostrando ? 'password' : 'text';
+      botao.innerHTML = mostrando ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
+    });
+  }
+  shLigarToggleSenha('toggle-senha-login', 'login-senha');
+  shLigarToggleSenha('toggle-senha-cadastro', 'cadastro-senha');
+  shLigarToggleSenha('toggle-senha-confirmar', 'cadastro-confirmar-senha');
+</script>
+</body>
+</html>

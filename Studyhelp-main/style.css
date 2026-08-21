@@ -1,0 +1,249 @@
+/* ==========================================================
+   StudyHelp — Design System
+   Cores: #2E7D32 (verde), #81C784 (verde claro), #DFEDD4 (verde pálido),
+          #9575CD (roxo), #263238 (escuro)
+   Tipografia: Poppins (SemiBold / Regular)
+   ========================================================== */
+
+:root {
+  --sh-green-dark: #2E7D32;
+  --sh-green: #81C784;
+  --sh-green-pale: #DFEDD4;
+  --sh-purple: #9575CD;
+  --sh-ink: #263238;
+  --sh-white: #FFFFFF;
+  --sh-gray: #6B7A70;
+  --sh-border: #E1E9DF;
+  --sh-radius: 14px;
+  --sh-shadow: 0 4px 18px rgba(38, 50, 40, 0.06);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Poppins', system-ui, sans-serif;
+  color: var(--sh-ink);
+  background-color: #FBFCFA;
+  font-weight: 400;
+}
+
+h1, h2, h3, h4, h5, .fw-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  color: var(--sh-ink);
+}
+
+a { text-decoration: none; }
+
+/* ---------- Navbar ---------- */
+.sh-navbar {
+  background: var(--sh-white);
+  border-bottom: 1px solid var(--sh-border);
+  padding: 0.85rem 0;
+}
+
+.sh-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: var(--sh-ink);
+}
+
+.sh-logo svg { flex-shrink: 0; }
+
+.sh-nav-link {
+  color: var(--sh-gray);
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  transition: all .15s ease;
+}
+.sh-nav-link:hover, .sh-nav-link.active {
+  color: var(--sh-green-dark);
+  background: var(--sh-green-pale);
+}
+
+.sh-search {
+  border-radius: 10px;
+  border: 1px solid var(--sh-border);
+  background: #F7FAF6;
+}
+.sh-search:focus { border-color: var(--sh-green); box-shadow: 0 0 0 3px rgba(129,199,132,.25); }
+
+/* ---------- Buttons ---------- */
+.btn-sh-primary {
+  background: var(--sh-green-dark);
+  border: none;
+  color: #fff;
+  font-weight: 500;
+  border-radius: 10px;
+  padding: 0.6rem 1.3rem;
+  transition: background .15s ease;
+}
+.btn-sh-primary:hover { background: #245e29; color: #fff; }
+
+.btn-sh-outline {
+  background: transparent;
+  border: 1.5px solid var(--sh-green-dark);
+  color: var(--sh-green-dark);
+  font-weight: 500;
+  border-radius: 10px;
+  padding: 0.55rem 1.3rem;
+  transition: all .15s ease;
+}
+.btn-sh-outline:hover { background: var(--sh-green-pale); color: var(--sh-green-dark); }
+
+.btn-sh-purple {
+  background: var(--sh-purple);
+  border: none;
+  color: #fff;
+  font-weight: 500;
+  border-radius: 10px;
+  padding: 0.55rem 1.2rem;
+}
+.btn-sh-purple:hover { background: #7e5cc2; color: #fff; }
+
+/* Botões alternáveis (ex: tipo de conteúdo) — preto quando não selecionado, verde quando selecionado */
+.sh-type-btn {
+  background: transparent;
+  border: 1.5px solid var(--sh-ink);
+  color: var(--sh-ink);
+  font-weight: 500;
+  font-size: 0.85rem;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  transition: all .15s ease;
+}
+.sh-type-btn:hover { background: #F5F5F5; }
+.sh-type-btn.selected {
+  background: var(--sh-green-dark);
+  border-color: var(--sh-green-dark);
+  color: #fff;
+}
+
+/* ---------- Cards ---------- */
+.sh-card {
+  background: var(--sh-white);
+  border: 1px solid var(--sh-border);
+  border-radius: var(--sh-radius);
+  box-shadow: var(--sh-shadow);
+}
+
+.sh-icon-badge {
+  width: 46px; height: 46px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--sh-green-pale);
+  color: var(--sh-green-dark);
+  font-size: 1.2rem;
+}
+
+.sh-icon-badge.purple { background: #EDE7F6; color: var(--sh-purple); }
+
+.sh-pill {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: var(--sh-green-pale);
+  color: var(--sh-green-dark);
+}
+.sh-pill.warn { background: #FFF3CD; color: #8a6d1a; }
+.sh-pill.purple { background: #EDE7F6; color: var(--sh-purple); }
+.sh-pill.gray { background: #EEF1EF; color: var(--sh-gray); }
+
+/* ---------- Hero ---------- */
+.sh-hero {
+  background: linear-gradient(135deg, var(--sh-green-pale) 0%, #F3F8F1 60%, #FBFCFA 100%);
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+/* ---------- Sidebar (painéis internos) ---------- */
+/* No celular, o menu fica empilhado ACIMA do conteúdo (largura total).
+   A partir de telas grandes (lg), ele vira uma coluna fixa ao lado. */
+.sh-sidebar {
+  background: var(--sh-white);
+  border-bottom: 1px solid var(--sh-border);
+  width: 100%;
+}
+.sh-dashboard-layout {
+  display: flex;
+  flex-direction: column;
+}
+@media (min-width: 992px) {
+  .sh-dashboard-layout { flex-direction: row; }
+  .sh-sidebar {
+    width: 230px;
+    min-width: 230px;
+    min-height: calc(100vh - 70px);
+    border-right: 1px solid var(--sh-border);
+    border-bottom: none;
+  }
+}
+.sh-side-link {
+  display: flex; align-items: center; gap: 0.7rem;
+  padding: 0.65rem 1rem;
+  border-radius: 10px;
+  color: var(--sh-gray);
+  font-weight: 500;
+  font-size: 0.93rem;
+}
+.sh-side-link:hover { background: #F5F8F4; color: var(--sh-ink); }
+.sh-side-link.active { background: var(--sh-green-dark); color: #fff; }
+
+/* ---------- Footer ---------- */
+.sh-footer {
+  background: var(--sh-white);
+  border-top: 1px solid var(--sh-border);
+  padding: 2.2rem 0 1.2rem;
+  font-size: 0.9rem;
+  color: var(--sh-gray);
+}
+.sh-footer h6 { font-size: 0.85rem; font-weight: 600; color: var(--sh-ink); margin-bottom: 0.6rem; }
+.sh-footer a { color: var(--sh-gray); }
+.sh-footer a:hover { color: var(--sh-green-dark); }
+
+/* ---------- Avatars ---------- */
+.sh-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--sh-green-pale);
+}
+.sh-avatar-lg { width: 84px; height: 84px; }
+
+/* ---------- Misc ---------- */
+.sh-muted { color: var(--sh-gray); }
+.sh-chat-bubble-me {
+  background: var(--sh-green-dark);
+  color: #fff;
+  border-radius: 14px 14px 2px 14px;
+  padding: 0.65rem 1rem;
+  max-width: 70%;
+}
+.sh-chat-bubble-other {
+  background: #F1F4F0;
+  color: var(--sh-ink);
+  border-radius: 14px 14px 14px 2px;
+  padding: 0.65rem 1rem;
+  max-width: 70%;
+}
+.sh-progress {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--sh-green-pale);
+}
+.sh-progress-bar { background: var(--sh-green-dark); border-radius: 999px; }
+
+.sh-lock-overlay {
+  position: absolute; inset: 0;
+  background: rgba(255,255,255,.72);
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--sh-radius);
+  backdrop-filter: blur(1px);
+}

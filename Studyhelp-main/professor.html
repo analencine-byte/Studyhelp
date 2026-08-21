@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel do Professor — StudyHelp</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+</head>
+<body>
+<nav class="sh-navbar">
+  <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
+    <a href="professor.html" class="sh-logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 6C10 4.5 6.5 4 3 4v13c3.5 0 7 .5 9 2 2-1.5 5.5-2 9-2V4c-3.5 0-7 .5-9 2Z" fill="#2E7D32"/></svg>
+      StudyHelp <span class="sh-pill purple ms-2">Professor</span>
+    </a>
+    <div class="dropdown">
+      <div class="d-flex align-items-center gap-2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="https://i.pravatar.cc/80?img=47" class="sh-avatar sh-user-avatar" style="width:36px;height:36px">
+        <span style="font-size:.9rem">Olá, <span class="sh-user-firstname">Professor</span></span>
+        <i class="bi bi-chevron-down sh-muted" style="font-size:.75rem"></i>
+      </div>
+      <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2" style="border-radius:12px;border-color:var(--sh-border)">
+        <li><a class="dropdown-item" href="perfil.html"><i class="bi bi-person me-2"></i>Meu perfil</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-danger" href="index.html" onclick="shLogout()"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="sh-dashboard-layout">
+  <aside class="sh-sidebar p-3">
+    <a href="#inicio" class="sh-side-link mb-1 active" data-prof-nav="inicio"><i class="bi bi-house-door"></i> Início</a>
+    <a href="#materias" class="sh-side-link mb-1" data-prof-nav="materias"><i class="bi bi-journal-bookmark"></i> Minhas matérias</a>
+    <a href="#alunos" class="sh-side-link mb-1" data-prof-nav="alunos"><i class="bi bi-people"></i> Meus alunos</a>
+    <a href="materiais.html" class="sh-side-link mb-1"><i class="bi bi-file-earmark-text"></i> Materiais</a>
+    <a href="tutores.html" class="sh-side-link mb-1"><i class="bi bi-search"></i> Área pública</a>
+    <hr>
+    <a href="index.html" class="sh-side-link" onclick="shLogout()"><i class="bi bi-box-arrow-right"></i> Sair</a>
+  </aside>
+
+  <main class="flex-grow-1 p-4" style="background:#FBFCFA">
+    <section id="sec-inicio" class="prof-section">
+      <div class="mb-4">
+        <h1 class="h4 mb-1">Olá, <span class="sh-user-firstname">Professor</span> 👋</h1>
+        <p class="sh-muted mb-0">Este é o seu espaço para organizar matérias e acompanhar seus alunos.</p>
+      </div>
+      <div class="row g-3 mb-4" id="kpis-professor"></div>
+      <div class="sh-card p-4">
+        <h2 class="h6 mb-1">Atalhos rápidos</h2>
+        <p class="sh-muted" style="font-size:.86rem">Cada botão abre diretamente a atividade correspondente.</p>
+        <div class="row g-3 mt-1">
+          <div class="col-md-4"><button class="sh-card p-3 w-100 text-start border-0" data-prof-go="materias"><i class="bi bi-journal-bookmark-fill fs-4"></i><div class="fw-semibold mt-2">Minhas matérias</div><div class="sh-muted" style="font-size:.8rem">Editar ou retirar matérias.</div></button></div>
+          <div class="col-md-4"><button class="sh-card p-3 w-100 text-start border-0" data-prof-go="alunos"><i class="bi bi-people-fill fs-4"></i><div class="fw-semibold mt-2">Meus alunos</div><div class="sh-muted" style="font-size:.8rem">Ver quem está inscrito em cada matéria.</div></button></div>
+          <div class="col-md-4"><a class="sh-card p-3 w-100 text-start d-block text-reset" href="materiais.html"><i class="bi bi-file-earmark-plus-fill fs-4"></i><div class="fw-semibold mt-2">Materiais</div><div class="sh-muted" style="font-size:.8rem">Acesse os conteúdos da plataforma.</div></a></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-materias" class="prof-section d-none">
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div><h2 class="h5 mb-1">Minhas matérias</h2><p class="sh-muted mb-0">Matérias em que você atua como professor.</p></div>
+        <button class="btn btn-sh-primary btn-sm" id="btn-adicionar-materia"><i class="bi bi-plus-lg"></i> Adicionar matéria</button>
+      </div>
+      <div class="row g-3" id="lista-minhas-materias"></div>
+      <div id="materias-prof-vazio" class="sh-card p-4 text-center d-none">Você ainda não está vinculado a nenhuma matéria.</div>
+    </section>
+
+    <section id="sec-alunos" class="prof-section d-none">
+      <div class="mb-3"><h2 class="h5 mb-1">Meus alunos</h2><p class="sh-muted mb-0">Veja cada aluno junto das matérias em que ele está inscrito.</p></div>
+      <div class="sh-card p-3">
+        <div class="table-responsive">
+          <table class="table align-middle mb-0" style="font-size:.88rem">
+            <thead><tr class="sh-muted"><th>Aluno</th><th>Email</th><th>Minhas matérias</th></tr></thead>
+            <tbody id="tabela-meus-alunos"></tbody>
+          </table>
+        </div>
+        <p id="meus-alunos-vazio" class="sh-muted text-center py-4 d-none">Nenhum aluno está inscrito nas suas matérias.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modal fade" id="modalProfessorMateria" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:14px">
+      <div class="modal-header"><h5 class="modal-title">Adicionar matéria</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body"><div id="opcoes-materia-prof" class="d-grid gap-2"></div><p id="opcoes-materia-vazio" class="sh-muted text-center d-none">Não há matérias disponíveis.</p></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+<script>
+  const professor = shGetUser();
+  if (!shEstaLogado() || professor.papel !== 'Tutor' || professor.status !== 'Aprovado') window.location.replace('login.html');
+
+  function minhasMaterias() {
+    return shGetMaterias().filter(m => (m.tutoresIds || []).includes(professor.email));
+  }
+
+  function abrirSecao(nome) {
+    document.querySelectorAll('.prof-section').forEach(s => s.classList.add('d-none'));
+    document.getElementById('sec-' + nome).classList.remove('d-none');
+    document.querySelectorAll('[data-prof-nav]').forEach(a => a.classList.toggle('active', a.dataset.profNav === nome));
+    if (nome === 'materias') renderMinhasMaterias();
+    if (nome === 'alunos') renderMeusAlunos();
+    if (nome === 'inicio') renderKpis();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  document.querySelectorAll('[data-prof-nav]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); abrirSecao(a.dataset.profNav); history.replaceState(null, '', '#' + a.dataset.profNav); }));
+  document.querySelectorAll('[data-prof-go]').forEach(b => b.addEventListener('click', () => abrirSecao(b.dataset.profGo)));
+
+  function renderKpis() {
+    const materias = minhasMaterias();
+    const alunosIds = new Set(materias.flatMap(m => m.alunosIds || []));
+    document.getElementById('kpis-professor').innerHTML = `
+      <div class="col-6 col-md-4"><div class="sh-card p-3"><div class="sh-muted" style="font-size:.8rem">Minhas matérias</div><div class="h4 mb-0">${materias.length}</div></div></div>
+      <div class="col-6 col-md-4"><div class="sh-card p-3"><div class="sh-muted" style="font-size:.8rem">Meus alunos</div><div class="h4 mb-0">${alunosIds.size}</div></div></div>
+      <div class="col-12 col-md-4"><div class="sh-card p-3"><div class="sh-muted" style="font-size:.8rem">Status</div><div class="h6 mb-0"><span class="sh-pill">Professor aprovado</span></div></div></div>`;
+  }
+
+  function renderMinhasMaterias() {
+    const lista = minhasMaterias();
+    const container = document.getElementById('lista-minhas-materias');
+    container.innerHTML = '';
+    document.getElementById('materias-prof-vazio').classList.toggle('d-none', lista.length > 0);
+    lista.forEach(m => {
+      const alunos = (m.alunosIds || []).length;
+      const col = document.createElement('div');
+      col.className = 'col-md-6 col-xl-4';
+      col.innerHTML = `<div class="sh-card p-3 h-100"><div class="sh-icon-badge purple mb-2"><i class="bi bi-journal-bookmark-fill"></i></div><div class="fw-semibold">${m.nome}</div><div class="sh-muted mt-1" style="font-size:.82rem">${alunos} aluno(s) inscrito(s)</div><div class="d-flex gap-2 mt-3"><button class="btn btn-sh-outline btn-sm flex-fill" data-editar-prof-materia="${m.id}"><i class="bi bi-pencil-square me-1"></i> Editar</button><button class="btn btn-outline-danger btn-sm" data-remover-prof-materia="${m.id}"><i class="bi bi-trash"></i></button></div></div>`;
+      container.appendChild(col);
+    });
+    document.querySelectorAll('[data-remover-prof-materia]').forEach(b => b.addEventListener('click', () => removerMateriaProfessor(b.dataset.removerProfMateria)));
+    document.querySelectorAll('[data-editar-prof-materia]').forEach(b => b.addEventListener('click', () => editarMateriaProfessor(b.dataset.editarProfMateria)));
+    renderKpis();
+  }
+
+  function editarMateriaProfessor(id) {
+    const materias = shGetMaterias();
+    const materia = materias.find(m => m.id === id);
+    if (!materia) return;
+    const novoNome = prompt('Digite o novo nome da matéria:', materia.nome);
+    if (!novoNome || !novoNome.trim()) return;
+    materia.nome = novoNome.trim();
+    shSalvarMaterias(materias);
+    shAdicionarAtividade(`O professor ${professor.nome} editou a matéria ${id}`);
+    renderMinhasMaterias();
+    renderMeusAlunos();
+  }
+
+  function removerMateriaProfessor(id) {
+    const materias = shGetMaterias();
+    const materia = materias.find(m => m.id === id);
+    if (!materia) return;
+    if (!confirm(`Excluir a matéria "${materia.nome}" da sua lista?`)) return;
+    materia.tutoresIds = (materia.tutoresIds || []).filter(email => email !== professor.email);
+    const idxUser = shGetUsuarios().findIndex(u => u.email === professor.email);
+    if (idxUser >= 0) {
+      const usuarios = shGetUsuarios();
+      usuarios[idxUser].materias = (usuarios[idxUser].materias || []).filter(mid => mid !== id);
+      shSalvarUsuarios(usuarios);
+    }
+    shSalvarMaterias(materias);
+    shAdicionarAtividade(`O professor ${professor.nome} removeu a matéria ${materia.nome}`);
+    renderMinhasMaterias();
+  }
+
+  function abrirAdicionarMateria() {
+    const materias = shGetMaterias();
+    const minhas = new Set(minhasMaterias().map(m => m.id));
+    const disponiveis = materias.filter(m => !minhas.has(m.id));
+    const box = document.getElementById('opcoes-materia-prof');
+    box.innerHTML = '';
+    document.getElementById('opcoes-materia-vazio').classList.toggle('d-none', disponiveis.length > 0);
+    disponiveis.forEach(m => box.insertAdjacentHTML('beforeend', `<button class="btn btn-sh-outline text-start" data-add-prof-materia="${m.id}"><i class="bi bi-plus-circle me-2"></i>${m.nome}</button>`));
+    document.querySelectorAll('[data-add-prof-materia]').forEach(b => b.addEventListener('click', () => adicionarMateriaProfessor(b.dataset.addProfMateria)));
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalProfessorMateria')).show();
+  }
+
+  function adicionarMateriaProfessor(id) {
+    const materias = shGetMaterias();
+    const materia = materias.find(m => m.id === id);
+    if (!materia) return;
+    materia.tutoresIds = [...new Set([...(materia.tutoresIds || []), professor.email])];
+    materia.alunosIds = materia.alunosIds || [];
+    const usuarios = shGetUsuarios();
+    const conta = usuarios.find(u => u.email === professor.email);
+    if (conta) conta.materias = [...new Set([...(conta.materias || []), materia.id])];
+    shSalvarMaterias(materias);
+    shSalvarUsuarios(usuarios);
+    shAdicionarAtividade(`O professor ${professor.nome} assumiu a matéria ${materia.nome}`);
+    bootstrap.Modal.getInstance(document.getElementById('modalProfessorMateria')).hide();
+    renderMinhasMaterias();
+  }
+
+  function renderMeusAlunos() {
+    const minhas = minhasMaterias();
+    const ids = [...new Set(minhas.flatMap(m => m.alunosIds || []))];
+    const alunos = shGetUsuarios().filter(u => u.papel === 'Aluno' && ids.includes(u.id));
+    const corpo = document.getElementById('tabela-meus-alunos');
+    corpo.innerHTML = '';
+    document.getElementById('meus-alunos-vazio').classList.toggle('d-none', alunos.length > 0);
+    alunos.forEach(a => {
+      const ms = minhas.filter(m => (m.alunosIds || []).includes(a.id));
+      corpo.insertAdjacentHTML('beforeend', `<tr><td class="fw-semibold">${a.nome}</td><td class="sh-muted">${a.email}</td><td>${ms.map(m => `<span class="sh-pill me-1 mb-1 d-inline-block">${m.nome}</span>`).join('')}</td></tr>`);
+    });
+  }
+
+  document.getElementById('btn-adicionar-materia').addEventListener('click', abrirAdicionarMateria);
+  if (location.hash === '#materias') abrirSecao('materias');
+  else if (location.hash === '#alunos') abrirSecao('alunos');
+  else { renderKpis(); renderMinhasMaterias(); renderMeusAlunos(); }
+</script>
+</body>
+</html>

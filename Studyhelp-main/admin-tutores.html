@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tutores — StudyHelp</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+</head>
+<body>
+<nav class="sh-navbar">
+  <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
+    <a href="admin.html" class="sh-logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 6C10 4.5 6.5 4 3 4v13c3.5 0 7 .5 9 2 2-1.5 5.5-2 9-2V4c-3.5 0-7 .5-9 2Z" fill="#2E7D32"/></svg>
+      StudyHelp <span class="sh-pill gray ms-2">Admin</span>
+    </a>
+    <div class="dropdown">
+      <div class="d-flex align-items-center gap-2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="https://i.pravatar.cc/80?img=68" class="sh-avatar sh-user-avatar" style="width:36px;height:36px">
+        <span style="font-size:.9rem">Olá, <span class="sh-user-firstname">Admin</span></span>
+        <i class="bi bi-chevron-down sh-muted" style="font-size:.75rem"></i>
+      </div>
+      <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2" style="border-radius:12px;border-color:var(--sh-border)">
+        <li><a class="dropdown-item" href="perfil.html"><i class="bi bi-person me-2"></i>Meu perfil</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-danger" href="index.html" onclick="shLogout()"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="sh-dashboard-layout">
+  <div class="sh-sidebar p-3">
+    <a href="index.html" class="sh-side-link mb-1"><i class="bi bi-house-door"></i> Início</a>
+    <a href="admin.html" class="sh-side-link mb-1"><i class="bi bi-grid-1x2-fill"></i> Visão geral</a>
+    <a href="admin-usuarios.html" class="sh-side-link mb-1"><i class="bi bi-people"></i> Usuários</a>
+    <a href="admin-solicitacoes.html" class="sh-side-link mb-1"><i class="bi bi-person-check"></i> Solicitações</a>
+    <a href="admin-tutores.html" class="sh-side-link mb-1 active"><i class="bi bi-mortarboard"></i> Tutores</a>
+    <a href="admin-materias.html" class="sh-side-link mb-1"><i class="bi bi-journal-bookmark"></i> Matérias</a>
+    <a href="admin-relatorios.html" class="sh-side-link mb-1"><i class="bi bi-bar-chart"></i> Relatórios</a>
+    <a href="admin-config.html" class="sh-side-link mb-1"><i class="bi bi-gear"></i> Configurações</a>
+    <hr>
+    <a href="index.html" class="sh-side-link" onclick="shLogout()"><i class="bi bi-box-arrow-right"></i> Sair</a>
+  </div>
+
+  <main class="flex-grow-1 p-4" style="background:#FBFCFA">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+      <div>
+        <h1 class="h4 mb-1">Tutores</h1>
+        <p class="sh-muted mb-0">Veja as matérias de cada professor e os alunos inscritos.</p>
+      </div>
+      <div class="d-flex gap-2">
+        <a href="admin-materias.html" class="btn btn-sh-outline btn-sm"><i class="bi bi-journal-bookmark me-1"></i> Gerenciar matérias</a>
+        <button class="btn btn-sh-primary btn-sm" id="btn-ver-alunos"><i class="bi bi-people me-1"></i> Alunos</button>
+      </div>
+    </div>
+
+    <div class="row g-3" id="lista-tutores"></div>
+    <div id="tutores-vazio" class="sh-card p-4 text-center d-none">Nenhum tutor aprovado cadastrado.</div>
+  </main>
+</div>
+
+<div class="modal fade" id="modalEditarTutor" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:14px">
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title mb-1">Editar matérias do tutor</h5>
+          <div id="nome-tutor-modal" class="sh-muted" style="font-size:.85rem"></div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editor-tutor-id">
+        <label class="form-label fw-semibold" style="font-size:.88rem">Matérias</label>
+        <div id="lista-materias-tutor" class="d-grid gap-2"></div>
+        <div id="materias-tutor-vazio" class="sh-muted text-center py-3 d-none">Cadastre uma matéria primeiro.</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-sh-outline btn-sm" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-sh-primary btn-sm" id="btn-salvar-tutor">Salvar alterações</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalAlunos" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content" style="border-radius:14px">
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title mb-1">Alunos inscritos</h5>
+          <div class="sh-muted" style="font-size:.85rem">Aluno e matérias em que ele está inscrito.</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table align-middle mb-0" style="font-size:.88rem">
+            <thead><tr class="sh-muted"><th>Aluno</th><th>Email</th><th>Matérias inscritas</th></tr></thead>
+            <tbody id="tabela-alunos-materias"></tbody>
+          </table>
+        </div>
+        <p id="alunos-vazio" class="sh-muted text-center py-4 d-none">Nenhum aluno inscrito ainda.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+<script>
+  const adminAtual = shGetUser();
+  if (adminAtual.papel !== 'Administrador') window.location.replace('admin-login.html');
+
+  function nomesMaterias(materiaIds) {
+    const materias = shGetMaterias();
+    return (materiaIds || []).map(id => materias.find(m => m.id === id)).filter(Boolean);
+  }
+
+  function renderTutores() {
+    const tutores = shGetUsuarios().filter(u => u.papel === 'Tutor' && (u.status === 'Aprovado' || u.status === 'Ativo'));
+    const container = document.getElementById('lista-tutores');
+    container.innerHTML = '';
+    document.getElementById('tutores-vazio').classList.toggle('d-none', tutores.length > 0);
+
+    tutores.forEach(tutor => {
+      const materias = nomesMaterias(tutor.materias || []);
+      const col = document.createElement('div');
+      col.className = 'col-md-6 col-xl-4';
+      col.innerHTML = `
+        <div class="sh-card p-3 h-100">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <img src="${tutor.avatar || 'https://i.pravatar.cc/80?img=68'}" class="sh-avatar" style="width:46px;height:46px">
+            <div class="flex-grow-1">
+              <div class="fw-semibold">${tutor.nome}</div>
+              <div class="sh-muted" style="font-size:.78rem">${tutor.email}</div>
+            </div>
+            <span class="sh-pill purple">Tutor</span>
+          </div>
+          <div class="sh-muted mb-2" style="font-size:.78rem">Matérias ministradas</div>
+          <div class="mb-3">${materias.length ? materias.map(m => `<span class="sh-pill me-1 mb-1 d-inline-block">${m.nome}</span>`).join('') : '<span class="sh-muted" style="font-size:.85rem">Nenhuma matéria vinculada.</span>'}</div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sh-outline btn-sm" data-editar-tutor="${tutor.id}"><i class="bi bi-pencil-square me-1"></i> Editar</button>
+            <button class="btn btn-sh-outline btn-sm" data-alunos-tutor="${tutor.id}"><i class="bi bi-people me-1"></i> Alunos</button>
+            <button class="btn btn-outline-danger btn-sm" title="Excluir tutor" data-excluir-tutor="${tutor.id}"><i class="bi bi-trash"></i></button>
+          </div>
+        </div>`;
+      container.appendChild(col);
+    });
+
+    document.querySelectorAll('[data-editar-tutor]').forEach(btn => btn.addEventListener('click', () => abrirEditorTutor(btn.dataset.editarTutor)));
+    document.querySelectorAll('[data-alunos-tutor]').forEach(btn => btn.addEventListener('click', () => abrirAlunos(btn.dataset.alunosTutor)));
+    document.querySelectorAll('[data-excluir-tutor]').forEach(btn => btn.addEventListener('click', () => excluirTutor(btn.dataset.excluirTutor)));
+  }
+
+  function abrirEditorTutor(tutorId) {
+    const tutor = shGetUsuarios().find(u => u.id === tutorId);
+    if (!tutor) return;
+    document.getElementById('editor-tutor-id').value = tutorId;
+    document.getElementById('nome-tutor-modal').textContent = tutor.nome;
+    const materias = shGetMaterias();
+    const lista = document.getElementById('lista-materias-tutor');
+    lista.innerHTML = '';
+    document.getElementById('materias-tutor-vazio').classList.toggle('d-none', materias.length > 0);
+    materias.forEach(m => {
+      const checked = (tutor.materias || []).includes(m.id);
+      lista.insertAdjacentHTML('beforeend', `<label class="sh-card px-3 py-2 d-flex align-items-center gap-2" style="cursor:pointer"><input type="checkbox" class="form-check-input" value="${m.id}" ${checked ? 'checked' : ''}> <span>${m.nome}</span></label>`);
+    });
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalEditarTutor')).show();
+  }
+
+  document.getElementById('btn-salvar-tutor').addEventListener('click', () => {
+    const id = document.getElementById('editor-tutor-id').value;
+    const ids = [...document.querySelectorAll('#lista-materias-tutor input[type="checkbox"]:checked')].map(i => i.value);
+    const usuarios = shGetUsuarios();
+    const tutor = usuarios.find(u => u.id === id);
+    if (!tutor) return;
+    tutor.materias = ids;
+    shSalvarUsuarios(usuarios);
+    shAdicionarAtividade(`Matérias do tutor ${tutor.nome} foram atualizadas`);
+    bootstrap.Modal.getInstance(document.getElementById('modalEditarTutor')).hide();
+    renderTutores();
+  });
+
+  function excluirTutor(id) {
+    const usuarios = shGetUsuarios();
+    const tutor = usuarios.find(u => u.id === id);
+    if (!tutor) return;
+    if (!confirm(`Excluir o tutor ${tutor.nome}? Esta ação remove a conta dele da lista de usuários.`)) return;
+    shSalvarUsuarios(usuarios.filter(u => u.id !== id));
+    shAdicionarAtividade(`Tutor ${tutor.nome} foi removido da plataforma`);
+    renderTutores();
+  }
+
+  function abrirAlunos(tutorId) {
+    const tutor = tutorId ? shGetUsuarios().find(u => u.id === tutorId) : null;
+    const alunosIdsDoTutor = tutor ? new Set(nomesMaterias(tutor.materias || []).flatMap(m => m.alunosIds || [])) : null;
+    const alunos = shGetUsuarios().filter(u => u.papel === 'Aluno' && (!alunosIdsDoTutor || alunosIdsDoTutor.has(u.id)));
+    const materias = shGetMaterias();
+    const corpo = document.getElementById('tabela-alunos-materias');
+    corpo.innerHTML = '';
+    document.getElementById('alunos-vazio').classList.toggle('d-none', alunos.length > 0);
+    alunos.forEach(aluno => {
+      const inscritas = materias.filter(m => (m.alunosIds || []).includes(aluno.id) && (!tutor || (tutor.materias || []).includes(m.id)));
+      const materiasHtml = inscritas.length ? inscritas.map(m => `<span class="sh-pill me-1 mb-1 d-inline-block">${m.nome}</span>`).join('') : '<span class="sh-muted">Nenhuma inscrição</span>';
+      corpo.insertAdjacentHTML('beforeend', `<tr><td class="fw-semibold">${aluno.nome}</td><td class="sh-muted">${aluno.email}</td><td>${materiasHtml}</td></tr>`);
+    });
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalAlunos')).show();
+  }
+
+  document.getElementById('btn-ver-alunos').addEventListener('click', abrirAlunos);
+  renderTutores();
+</script>
+</body>
+</html>
