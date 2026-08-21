@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tutores — StudyHelp</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="sh-navbar">
+  <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <a href="index.html" class="sh-logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 6C10 4.5 6.5 4 3 4v13c3.5 0 7 .5 9 2 2-1.5 5.5-2 9-2V4c-3.5 0-7 .5-9 2Z" fill="#2E7D32"/></svg>
+      StudyHelp
+    </a>
+    <div class="d-none d-lg-flex gap-1">
+      <a href="aluno.html" class="sh-nav-link">Início</a>
+      <a href="materiais.html" class="sh-nav-link">Matérias</a>
+      <a href="tutores.html" class="sh-nav-link active">Tutores</a>
+    </div>
+    <div class="dropdown">
+      <div class="d-flex align-items-center gap-2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="https://i.pravatar.cc/80?img=47" class="sh-avatar sh-user-avatar" style="width:36px;height:36px">
+        <span style="font-size:.9rem">Olá, <span class="sh-user-firstname">Ana</span></span>
+        <i class="bi bi-chevron-down sh-muted" style="font-size:.75rem"></i>
+      </div>
+      <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2" style="border-radius:12px;border-color:var(--sh-border)">
+        <li><a class="dropdown-item" href="perfil.html"><i class="bi bi-person me-2"></i>Meu perfil</a></li>
+        <li><a class="dropdown-item" href="perfil.html#config"><i class="bi bi-gear me-2"></i>Configurações</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-danger" href="index.html" onclick="shLogout()"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-4">
+  <h1 class="h4 mb-1">Tutores disponíveis</h1>
+  <p class="sh-muted mb-3">Encontre o tutor ideal para te ajudar.</p>
+
+  <div class="d-flex gap-2 flex-wrap mb-4">
+    <input id="busca-tutor" class="form-control sh-search" style="max-width:320px" placeholder="Pesquisar tutores ou matérias...">
+    <select id="filtro-materia-tutor" class="form-select sh-search" style="max-width:190px">
+      <option value="todas">Todas as matérias</option>
+      <option value="Matemática">Matemática</option>
+      <option value="Português">Português</option>
+      <option value="Ciências">Ciências</option>
+      <option value="História">História</option>
+      <option value="Inglês">Inglês</option>
+    </select>
+    <select id="filtro-disponibilidade" class="form-select sh-search" style="max-width:190px">
+      <option value="todos">Disponibilidade</option>
+      <option value="agora">Disponível agora</option>
+      <option value="todos2">Todos</option>
+    </select>
+  </div>
+
+  <div class="row g-3" id="lista-tutores"></div>
+  <p id="msg-vazio-tutor" class="sh-muted text-center py-5 d-none">Nenhum tutor encontrado com esse filtro.</p>
+
+  <nav class="mt-4" id="paginacao-wrap">
+    <ul class="pagination justify-content-center" id="paginacao"></ul>
+  </nav>
+</div>
+
+<footer class="sh-footer mt-4">
+  <div class="container text-center">© 2026 StudyHelp. Todos os direitos reservados.</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+<script>shExigirLogin();</script>
+<script>
+  // ==========================================================
+  // Lista de tutores "de mentira" pra dar volume suficiente pra
+  // testar filtro + paginação de verdade. Quando o backend existir,
+  // isso vem de uma consulta ao banco (com LIMIT/OFFSET pra paginar).
+  // ==========================================================
+  const tutores = [
+    { nome: 'Lucas Oliveira', materia: 'Matemática', nota: 4.9, avals: 128, disp: true, foto: 12, desc: 'Professor de matemática com 8 anos de experiência. Ajudo alunos do fundamental ao ensino superior.' },
+    { nome: 'Juliana Santos', materia: 'Português', nota: 4.8, avals: 96, disp: true, foto: 32, desc: 'Especialista em redação e gramática. Vamos melhorar sua escrita e interpretação!' },
+    { nome: 'Rafael Costa', materia: 'Matemática', nota: 4.7, avals: 87, disp: true, foto: 51, desc: 'Aulas personalizadas de matemática para todos os níveis. Foco em resultados.' },
+    { nome: 'Carla Menezes', materia: 'Ciências', nota: 4.9, avals: 113, disp: true, foto: 47, desc: 'Bióloga e professora apaixonada por ensinar ciências de forma prática e divertida.' },
+    { nome: 'Rodrigo Alves', materia: 'História', nota: 4.6, avals: 54, disp: false, foto: 15, desc: 'Historiador com foco em Brasil Colônia e Era das Revoluções.' },
+    { nome: 'Fernanda Lopes', materia: 'Inglês', nota: 4.9, avals: 140, disp: true, foto: 25, desc: 'Aulas de conversação e gramática para todos os níveis, do básico ao avançado.' },
+    { nome: 'Beatriz Ramos', materia: 'Matemática', nota: 4.5, avals: 41, disp: true, foto: 9, desc: 'Aulas de reforço em álgebra e geometria para o ensino fundamental e médio.' },
+    { nome: 'Diego Martins', materia: 'Português', nota: 4.6, avals: 63, disp: false, foto: 22, desc: 'Foco em interpretação de texto e redação para vestibular e ENEM.' },
+    { nome: 'Camila Duarte', materia: 'Ciências', nota: 4.8, avals: 77, disp: true, foto: 44, desc: 'Química e Biologia com experimentos práticos explicados passo a passo.' },
+    { nome: 'Eduardo Nunes', materia: 'História', nota: 4.4, avals: 29, disp: true, foto: 6, desc: 'Especialista em história do Brasil e geopolítica contemporânea.' },
+    { nome: 'Larissa Prado', materia: 'Inglês', nota: 4.7, avals: 58, disp: false, foto: 36, desc: 'Preparação para provas de proficiência (TOEFL, IELTS) e inglês conversacional.' },
+    { nome: 'Thiago Rezende', materia: 'Matemática', nota: 4.8, avals: 102, disp: true, foto: 3, desc: 'Cálculo, trigonometria e preparação para o ENEM.' },
+    { nome: 'Patrícia Lima', materia: 'Português', nota: 4.9, avals: 88, disp: true, foto: 29, desc: 'Gramática descomplicada e produção textual para todas as idades.' },
+    { nome: 'Marcos Vieira', materia: 'Ciências', nota: 4.6, avals: 34, disp: false, foto: 18, desc: 'Física básica e experimentos de laboratório para o ensino médio.' }
+  ];
+
+  const POR_PAGINA = 6;
+  let paginaAtual = 1;
+
+  function tutoresFiltrados() {
+    const termo = document.getElementById('busca-tutor').value.trim().toLowerCase();
+    const materia = document.getElementById('filtro-materia-tutor').value;
+    const disp = document.getElementById('filtro-disponibilidade').value;
+
+    return tutores.filter(t => {
+      const bateMateria = materia === 'todas' || t.materia === materia;
+      const bateBusca = !termo || t.nome.toLowerCase().includes(termo) || t.materia.toLowerCase().includes(termo);
+      const bateDisp = disp !== 'agora' || t.disp === true;
+      return bateMateria && bateBusca && bateDisp;
+    });
+  }
+
+  function renderizarTutores() {
+    const filtrados = tutoresFiltrados();
+    const totalPaginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA));
+    if (paginaAtual > totalPaginas) paginaAtual = totalPaginas;
+
+    const inicio = (paginaAtual - 1) * POR_PAGINA;
+    const pagina = filtrados.slice(inicio, inicio + POR_PAGINA);
+
+    const lista = document.getElementById('lista-tutores');
+    lista.innerHTML = '';
+    document.getElementById('msg-vazio-tutor').classList.toggle('d-none', filtrados.length > 0);
+
+    pagina.forEach(t => {
+      const col = document.createElement('div');
+      col.className = 'col-md-6 col-lg-4';
+      // Só temos conversa simulada com esses 4 tutores por enquanto; os demais
+      // abrem o chat geral (quando o backend existir, todo tutor terá conversa).
+      const idsConversaExistente = { 'Lucas Oliveira': 'lucas', 'Juliana Santos': 'juliana', 'Rafael Costa': 'rafael', 'Carla Menezes': 'carla' };
+      const linkChat = idsConversaExistente[t.nome] ? `chat.html?tutor=${idsConversaExistente[t.nome]}` : 'chat.html';
+      col.innerHTML = `
+        <div class="sh-card p-3">
+          <div class="d-flex gap-3">
+            <img src="https://i.pravatar.cc/100?img=${t.foto}" class="sh-avatar-lg">
+            <div>
+              <div class="fw-semibold">${t.nome}</div>
+              <div class="sh-muted" style="font-size:.85rem">${t.materia}</div>
+              <div style="font-size:.85rem"><i class="bi bi-star-fill text-warning"></i> ${t.nota} <span class="sh-muted">(${t.avals} avaliações)</span></div>
+              <span class="sh-pill ${t.disp ? '' : 'gray'} mt-1">${t.disp ? 'Disponível agora' : 'Indisponível no momento'}</span>
+            </div>
+          </div>
+          <p class="sh-muted mt-2 mb-2" style="font-size:.85rem">${t.desc}</p>
+          <a href="${linkChat}" class="btn btn-sh-outline btn-sm w-100">Ver perfil</a>
+        </div>`;
+      lista.appendChild(col);
+    });
+
+    renderizarPaginacao(totalPaginas);
+  }
+
+  function irParaPagina(p) {
+    paginaAtual = p;
+    renderizarTutores();
+    document.getElementById('lista-tutores').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function renderizarPaginacao(totalPaginas) {
+    const ul = document.getElementById('paginacao');
+    ul.innerHTML = '';
+    document.getElementById('paginacao-wrap').classList.toggle('d-none', totalPaginas <= 1);
+
+    function addItem(label, pagina, opts) {
+      opts = opts || {};
+      const li = document.createElement('li');
+      li.className = 'page-item' + (opts.ativo ? ' active' : '') + (opts.desabilitado ? ' disabled' : '');
+      const a = document.createElement('a');
+      a.className = 'page-link';
+      a.href = '#';
+      a.textContent = label;
+      if (opts.ativo) a.style = 'background:var(--sh-green-dark);border-color:var(--sh-green-dark)';
+      if (!opts.desabilitado && !opts.semClique) {
+        a.addEventListener('click', function (e) { e.preventDefault(); irParaPagina(pagina); });
+      }
+      li.appendChild(a);
+      ul.appendChild(li);
+    }
+
+    addItem('‹', paginaAtual - 1, { desabilitado: paginaAtual === 1 });
+    for (let p = 1; p <= totalPaginas; p++) {
+      addItem(p, p, { ativo: p === paginaAtual });
+    }
+    addItem('›', paginaAtual + 1, { desabilitado: paginaAtual === totalPaginas });
+  }
+
+  document.getElementById('busca-tutor').addEventListener('input', function () { paginaAtual = 1; renderizarTutores(); });
+  document.getElementById('filtro-materia-tutor').addEventListener('change', function () { paginaAtual = 1; renderizarTutores(); });
+  document.getElementById('filtro-disponibilidade').addEventListener('change', function () { paginaAtual = 1; renderizarTutores(); });
+
+  renderizarTutores();
+</script>
+</body>
+</html>

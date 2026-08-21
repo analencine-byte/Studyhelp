@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel do Administrador — StudyHelp</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="sh-navbar">
+  <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
+    <a href="index.html" class="sh-logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 6C10 4.5 6.5 4 3 4v13c3.5 0 7 .5 9 2 2-1.5 5.5-2 9-2V4c-3.5 0-7 .5-9 2Z" fill="#2E7D32"/></svg>
+      StudyHelp <span class="sh-pill gray ms-2">Admin</span>
+    </a>
+    <div class="dropdown">
+      <div class="d-flex align-items-center gap-2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="https://i.pravatar.cc/80?img=68" class="sh-avatar sh-user-avatar" style="width:36px;height:36px">
+        <span style="font-size:.9rem">Olá, <span class="sh-user-firstname">Admin</span></span>
+        <i class="bi bi-chevron-down sh-muted" style="font-size:.75rem"></i>
+      </div>
+      <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2" style="border-radius:12px;border-color:var(--sh-border)">
+        <li><a class="dropdown-item" href="perfil.html"><i class="bi bi-person me-2"></i>Meu perfil</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-danger" href="index.html" onclick="shLogout()"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="sh-dashboard-layout">
+<div class="sh-sidebar p-3">
+    <a href="index.html" class="sh-side-link mb-1"><i class="bi bi-house-door"></i> Início</a>
+    <a href="admin.html" class="sh-side-link mb-1 active"><i class="bi bi-grid-1x2-fill"></i> Visão geral</a>
+    <a href="admin-usuarios.html" class="sh-side-link mb-1"><i class="bi bi-people"></i> Usuários</a>
+    <a href="admin-solicitacoes.html" class="sh-side-link mb-1"><i class="bi bi-person-check"></i> Solicitações</a>
+    <a href="admin-tutores.html" class="sh-side-link mb-1"><i class="bi bi-mortarboard"></i> Tutores</a>
+    <a href="admin-materias.html" class="sh-side-link mb-1"><i class="bi bi-journal-bookmark"></i> Matérias</a>
+    <a href="admin-relatorios.html" class="sh-side-link mb-1"><i class="bi bi-bar-chart"></i> Relatórios</a>
+    <a href="admin-config.html" class="sh-side-link mb-1"><i class="bi bi-gear"></i> Configurações</a>
+    <hr>
+    <a href="index.html" class="sh-side-link" onclick="shLogout()"><i class="bi bi-box-arrow-right"></i> Sair</a>
+  </div>
+  <div class="flex-grow-1 p-4" style="background:#FBFCFA">
+    <h1 class="h4 mb-1">Painel do Administrador</h1>
+    <p class="sh-muted mb-4">Gerencie usuários, matérias e o funcionamento da plataforma.</p>
+
+    <div class="row g-3 mb-4" id="kpis"></div>
+
+    <div class="row g-3">
+      <div class="col-lg-6">
+        <div class="sh-card p-3 mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h2 class="h6 mb-0">Solicitações de cadastro</h2>
+            <span class="sh-pill warn d-none" id="badge-pendentes"></span>
+          </div>
+          <div id="lista-solicitacoes-preview"></div>
+          <a href="admin-solicitacoes.html" class="sh-nav-link d-block text-center mt-2">Ver todas as solicitações</a>
+        </div>
+
+        <div class="sh-card p-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h2 class="h6 mb-0">Tutores</h2>
+            <a href="admin-tutores.html" class="sh-nav-link">Ver todos</a>
+          </div>
+          <div id="lista-tutores-preview"></div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="sh-card p-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h2 class="h6 mb-0">Atividade recente</h2>
+            <a href="admin-relatorios.html" class="sh-nav-link">Ver tudo</a>
+          </div>
+          <div id="lista-atividades-preview"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+
+<script>
+  // Bloqueia quem digitar essa URL direto sem ter passado pela senha administrativa
+  const u = shGetUser();
+  if (u.papel !== 'Administrador') window.location.href = 'admin-login.html';
+</script>
+
+<script>
+  function pillPapel(papel) {
+    if (papel === 'Tutor') return '<span class="sh-pill purple">Tutor</span>';
+    if (papel === 'Administrador') return '<span class="sh-pill gray">Admin</span>';
+    return '<span class="sh-pill gray">Aluno</span>';
+  }
+  function pillStatus(status) {
+    if (status === 'Pendente') return '<span class="sh-pill warn">Pendente</span>';
+    if (status === 'Recusado') return '<span class="sh-pill" style="background:#fde2e2;color:#b42318">Recusado</span>';
+    return '<span class="sh-pill">Ativo</span>';
+  }
+
+  function renderKPIs() {
+    const usuarios = shGetUsuarios();
+    const tutoresAtivos = usuarios.filter(u => u.papel === 'Tutor' && u.status !== 'Pendente' && u.status !== 'Recusado').length;
+    const alunos = usuarios.filter(u => u.papel === 'Aluno').length;
+    const materias = shGetMaterias().length;
+    document.getElementById('kpis').innerHTML = `
+      <div class="col-6 col-md-3"><div class="sh-card p-3"><div class="sh-muted" style="font-size:.8rem">Usuários totais</div><div class="h4 mb-0">${usuarios.length}</div></div></div>
+      <div class="col-6 col-md-3"><div class="sh-card p-3"><div class="sh-muted" style="font-size:.8rem">Tutores ativos</div><div class="h4 mb-0">${tutoresAtivos}</div></div></div>
+      <div class="col-6 col-md-3"><div class="sh-card p-3"><div class="sh-muted" style="font-size:.8rem">Alunos</div><div class="h4 mb-0">${alunos}</div></div></div>
+      <div class="col-6 col-md-3"><div class="sh-card p-3"><div class="sh-muted" style="font-size:.8rem">Matérias cadastradas</div><div class="h4 mb-0">${materias}</div></div></div>`;
+  }
+
+  function aprovarUsuario(id) {
+    const lista = shGetUsuarios();
+    const u = lista.find(x => x.id === id);
+    if (!u) return;
+    u.status = 'Aprovado';
+    shSalvarUsuarios(lista);
+    shAdicionarAtividade(`${u.nome} foi aprovado(a) como ${u.papel.toLowerCase()}`);
+    const contaAtual = shGetUser();
+    if (contaAtual.email === u.email) shIniciarSessao(u.papel, 'Aprovado');
+    renderTudo();
+  }
+  function recusarUsuario(id) {
+    const lista = shGetUsuarios();
+    const u = lista.find(x => x.id === id);
+    if (!u) return;
+    u.status = 'Recusado';
+    shSalvarUsuarios(lista);
+    shAdicionarAtividade(`Cadastro de ${u.nome} foi recusado`);
+    renderTudo();
+  }
+
+  function renderSolicitacoesPreview() {
+    const pendentes = shGetUsuarios().filter(u => u.status === 'Pendente');
+    const badge = document.getElementById('badge-pendentes');
+    badge.textContent = pendentes.length + (pendentes.length === 1 ? ' pendente' : ' pendentes');
+    badge.classList.toggle('d-none', pendentes.length === 0);
+
+    const cont = document.getElementById('lista-solicitacoes-preview');
+    cont.innerHTML = '';
+    if (pendentes.length === 0) {
+      cont.innerHTML = '<p class="sh-muted text-center py-3 mb-0" style="font-size:.85rem">Nenhuma solicitação pendente 🎉</p>';
+      return;
+    }
+    pendentes.slice(0, 2).forEach(u => {
+      const div = document.createElement('div');
+      div.className = 'd-flex justify-content-between align-items-center py-2 border-bottom';
+      div.innerHTML = `
+        <div><div class="fw-semibold" style="font-size:.9rem">${u.nome}</div><div class="sh-muted" style="font-size:.78rem">Solicitou como: ${u.papel}</div></div>
+        <div class="d-flex gap-1">
+          <button class="btn btn-sm btn-sh-primary" data-aprovar="${u.id}"><i class="bi bi-check-lg"></i></button>
+          <button class="btn btn-sm btn-outline-danger" data-recusar="${u.id}"><i class="bi bi-x-lg"></i></button>
+        </div>`;
+      cont.appendChild(div);
+    });
+    document.querySelectorAll('[data-aprovar]').forEach(btn => btn.addEventListener('click', function () { aprovarUsuario(this.dataset.aprovar); }));
+    document.querySelectorAll('[data-recusar]').forEach(btn => btn.addEventListener('click', function () { recusarUsuario(this.dataset.recusar); }));
+  }
+
+  function renderTutoresPreview() {
+    const tutores = shGetUsuarios().filter(u => u.papel === 'Tutor').slice(0, 4);
+    const cont = document.getElementById('lista-tutores-preview');
+    cont.innerHTML = '';
+    if (tutores.length === 0) {
+      cont.innerHTML = '<p class="sh-muted text-center py-3 mb-0" style="font-size:.85rem">Nenhum tutor ainda.</p>';
+      return;
+    }
+    tutores.forEach(t => {
+      const div = document.createElement('div');
+      div.className = 'd-flex justify-content-between align-items-center py-2 border-bottom';
+      div.style.fontSize = '.88rem';
+      div.innerHTML = `<span>${t.nome}</span>${pillStatus(t.status)}`;
+      cont.appendChild(div);
+    });
+  }
+
+  function renderAtividadesPreview() {
+    const lista = shGetAtividades().slice(0, 5);
+    const cont = document.getElementById('lista-atividades-preview');
+    cont.innerHTML = '';
+    if (lista.length === 0) {
+      cont.innerHTML = '<p class="sh-muted text-center py-3 mb-0" style="font-size:.85rem">Nenhuma atividade recente.</p>';
+      return;
+    }
+    lista.forEach(a => {
+      const div = document.createElement('div');
+      div.className = 'd-flex justify-content-between py-2 border-bottom';
+      div.style.fontSize = '.85rem';
+      div.style.cursor = 'pointer';
+      div.innerHTML = `<span>${a.texto}</span><span class="sh-muted">${a.tempo}</span>`;
+      div.addEventListener('click', () => alert(a.texto + '\n\n' + a.tempo));
+      cont.appendChild(div);
+    });
+  }
+
+  function renderTudo() {
+    renderKPIs();
+    renderSolicitacoesPreview();
+    renderTutoresPreview();
+    renderAtividadesPreview();
+  }
+  renderTudo();
+</script>
+</body>
+</html>
