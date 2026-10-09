@@ -44,18 +44,18 @@
     <!-- MENU LATERAL DO PERFIL -->
     <div class="col-md-3">
       <div class="sh-card p-2">
-        <a href="#dados" class="sh-side-link active mb-1"><i class="bi bi-person"></i> Meu perfil</a>
-        <a href="#atividades" class="sh-side-link mb-1"><i class="bi bi-clock-history"></i> Minhas atividades</a>
-        <a href="cadernos.html" class="sh-side-link mb-1"><i class="bi bi-journal-bookmark"></i> Meus cadernos</a>
-        <a href="#" class="sh-side-link mb-1"><i class="bi bi-star"></i> Matérias favoritas</a>
+        <a href="#dados" class="sh-side-link active mb-1 sh-perfil-tab" data-view="dados"><i class="bi bi-person"></i> Meu perfil</a>
+        <a href="#atividades" class="sh-side-link mb-1 sh-perfil-tab sh-so-aluno" data-view="atividades"><i class="bi bi-clock-history"></i> Minhas atividades</a>
+        <a href="cadernos.html" class="sh-side-link mb-1 sh-so-aluno"><i class="bi bi-journal-bookmark"></i> Meus cadernos</a>
+        <a href="#favoritas" class="sh-side-link mb-1 sh-perfil-tab sh-so-aluno" data-view="favoritas"><i class="bi bi-star"></i> Matérias favoritas</a>
         <a href="chat.html" class="sh-side-link mb-1"><i class="bi bi-chat-dots"></i> Mensagens</a>
-        <a href="#config" class="sh-side-link"><i class="bi bi-gear"></i> Configurações</a>
+        <a href="#config" class="sh-side-link sh-perfil-tab" data-view="config"><i class="bi bi-gear"></i> Configurações</a>
       </div>
     </div>
 
     <!-- CONTEÚDO -->
     <div class="col-md-9">
-      <div class="sh-card p-4 mb-3" id="dados">
+      <div class="sh-card p-4 mb-3 sh-perfil-view" id="dados">
         <div class="d-flex align-items-center gap-3 mb-3">
           <div class="position-relative" style="width:84px">
             <img src="https://i.pravatar.cc/160?img=47" class="sh-avatar-lg sh-user-avatar">
@@ -71,7 +71,7 @@
               <span class="sh-pill sh-user-role">Aluna</span>
             </div>
             <div class="sh-muted sh-user-email" style="font-size:.88rem">ana.fernanda@email.com</div>
-            <div class="sh-muted" style="font-size:.8rem">Membro desde Maio/2024</div>
+            <div class="sh-muted sh-user-membro-desde" style="font-size:.8rem"></div>
           </div>
           <button class="btn btn-sh-outline btn-sm">Editar perfil</button>
         </div>
@@ -92,24 +92,21 @@
         </div>
       </div>
 
-      <div class="sh-card p-4 mb-3" id="atividades">
-        <h2 class="h6 mb-3">Histórico de atividades</h2>
-        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-          <div><div class="fw-semibold" style="font-size:.9rem">Dúvida sobre Funções do 1º grau</div><div class="sh-muted" style="font-size:.8rem">Matemática · 22/05/2026</div></div>
-          <span class="sh-pill">Respondida</span>
-        </div>
-        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-          <div><div class="fw-semibold" style="font-size:.9rem">Redação: Dissertação argumentativa</div><div class="sh-muted" style="font-size:.8rem">Português · 20/05/2026</div></div>
-          <span class="sh-pill warn">Em andamento</span>
-        </div>
-        <div class="d-flex justify-content-between align-items-center py-2">
-          <div><div class="fw-semibold" style="font-size:.9rem">Avaliou o tutor Rafael Costa</div><div class="sh-muted" style="font-size:.8rem">18/05/2026</div></div>
-          <span style="font-size:.85rem"><i class="bi bi-star-fill text-warning"></i> 5.0</span>
-        </div>
+      <div class="sh-card p-4 mb-3 sh-perfil-view d-none" id="atividades">
+        <h2 class="h6 mb-3">Minhas atividades</h2>
+        <div id="lista-atividades"></div>
       </div>
 
-      <div class="sh-card p-4" id="config">
-        <h2 class="h6 mb-3">Configurações da conta</h2>
+      <div class="sh-card p-4 mb-3 sh-perfil-view d-none" id="favoritas">
+        <h2 class="h6 mb-1">Matérias favoritas</h2>
+        <p class="sh-muted" style="font-size:.85rem">Clique numa matéria para favoritar ou remover.</p>
+        <div class="d-flex flex-wrap gap-2 mb-3" id="lista-favoritas"></div>
+        <a href="materiais.html" class="btn btn-sh-outline btn-sm">Ver materiais</a>
+      </div>
+
+      <div class="sh-card p-4 sh-perfil-view d-none" id="config">
+        <h2 class="h6 mb-1">Configurações da conta <span class="sh-pill ms-1 sh-user-role"></span></h2>
+        <p class="sh-muted" style="font-size:.85rem">As opções abaixo dependem do seu tipo de conta.</p>
         <form id="form-config">
           <div class="row g-2 mb-2">
             <div class="col-md-6">
@@ -125,11 +122,32 @@
             <label class="form-label fw-semibold" style="font-size:.88rem">Nova senha</label>
             <input type="password" class="form-control sh-search" placeholder="Deixe em branco para manter a atual">
           </div>
-          <div class="form-check form-switch mb-3">
-            <input class="form-check-input" type="checkbox" checked>
-            <label class="form-check-label sh-muted" style="font-size:.88rem">Receber notificações por email</label>
+
+          <div class="sh-cfg sh-cfg-Aluno">
+            <h3 class="h6 mt-3">Preferências de aluno</h3>
+            <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" data-cfg="aluno_resposta" checked><label class="form-check-label sh-muted" style="font-size:.88rem">Avisar quando um tutor responder minha dúvida</label></div>
+            <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" data-cfg="aluno_lembretes" checked><label class="form-check-label sh-muted" style="font-size:.88rem">Lembretes de atividades em andamento</label></div>
+            <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" data-cfg="aluno_perfil_publico"><label class="form-check-label sh-muted" style="font-size:.88rem">Deixar meu perfil visível para tutores</label></div>
+            <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" data-cfg="aluno_email" checked><label class="form-check-label sh-muted" style="font-size:.88rem">Receber notificações por email</label></div>
           </div>
-          <button class="btn btn-sh-primary btn-sm" type="submit">Salvar alterações</button>
+
+          <div class="sh-cfg sh-cfg-Tutor d-none">
+            <h3 class="h6 mt-3">Preferências de tutor</h3>
+            <div class="mb-2"><label class="form-label fw-semibold" style="font-size:.88rem">Sobre mim</label><textarea class="form-control sh-search" rows="2" data-cfg="tutor_bio" placeholder="Conte um pouco da sua experiência"></textarea></div>
+            <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" data-cfg="tutor_disponivel" checked><label class="form-check-label sh-muted" style="font-size:.88rem">Disponível para receber dúvidas</label></div>
+            <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" data-cfg="tutor_novas_duvidas" checked><label class="form-check-label sh-muted" style="font-size:.88rem">Avisar sobre novas dúvidas dos alunos</label></div>
+            <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" data-cfg="tutor_email" checked><label class="form-check-label sh-muted" style="font-size:.88rem">Receber notificações por email</label></div>
+            <a href="professor.html" class="btn btn-sh-outline btn-sm mb-2">Gerenciar minhas matérias</a>
+          </div>
+
+          <div class="sh-cfg sh-cfg-Administrador d-none">
+            <h3 class="h6 mt-3">Preferências de administrador</h3>
+            <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" data-cfg="adm_solicitacoes" checked><label class="form-check-label sh-muted" style="font-size:.88rem">Avisar sobre novas solicitações de tutor</label></div>
+            <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" data-cfg="adm_relatorio"><label class="form-check-label sh-muted" style="font-size:.88rem">Receber relatório semanal por email</label></div>
+            <a href="admin-config.html" class="btn btn-sh-outline btn-sm mb-2">Configurações da plataforma</a>
+          </div>
+
+          <div><button class="btn btn-sh-primary btn-sm mt-2" type="submit">Salvar alterações</button></div>
         </form>
       </div>
     </div>
@@ -145,12 +163,61 @@
 <script src="app.js"></script>
 <script>shExigirLogin();</script>
 <script>
+  // ===== Abas do perfil (Meu perfil / Atividades / Favoritas / Configurações) =====
+  const SH_USER_PERFIL = shGetUser();
+  const SH_E_ALUNO = SH_USER_PERFIL.papel === 'Aluno';
+  if (!SH_E_ALUNO) document.querySelectorAll('.sh-so-aluno').forEach(el => el.classList.add('d-none'));
+  document.querySelectorAll('.sh-cfg').forEach(el => el.classList.toggle('d-none', !el.classList.contains('sh-cfg-' + SH_USER_PERFIL.papel)));
+
+  function mostrarAba(nome) {
+    if (!SH_E_ALUNO && (nome === 'atividades' || nome === 'favoritas')) nome = 'dados';
+    if (!document.getElementById(nome)) nome = 'dados';
+    document.querySelectorAll('.sh-perfil-view').forEach(el => el.classList.toggle('d-none', el.id !== nome));
+    document.querySelectorAll('.sh-perfil-tab').forEach(el => el.classList.toggle('active', el.dataset.view === nome));
+  }
+  document.querySelectorAll('.sh-perfil-tab').forEach(el => el.addEventListener('click', function (e) {
+    e.preventDefault(); mostrarAba(this.dataset.view); history.replaceState(null, '', '#' + this.dataset.view);
+  }));
+  mostrarAba(location.hash.replace('#', '') || 'dados');
+  window.addEventListener('hashchange', () => mostrarAba(location.hash.replace('#', '') || 'dados'));
+
+  shRenderizarAtividades('#lista-atividades');
+
+  function desenharFavoritas() {
+    const favs = shGetMateriasFavoritas();
+    const alvo = document.getElementById('lista-favoritas'); alvo.innerHTML = '';
+    SH_TODAS_MATERIAS.forEach(m => {
+      const ativo = favs.includes(m);
+      const b = document.createElement('button'); b.type = 'button';
+      b.className = 'btn btn-sm ' + (ativo ? 'btn-sh-primary' : 'btn-sh-outline');
+      b.innerHTML = '<i class="bi ' + (ativo ? 'bi-star-fill' : 'bi-star') + ' me-1"></i>';
+      b.append(m);
+      b.addEventListener('click', () => {
+        const atual = shGetMateriasFavoritas();
+        shSalvarMateriasFavoritas(atual.includes(m) ? atual.filter(x => x !== m) : atual.concat(m));
+        desenharFavoritas();
+      });
+      alvo.appendChild(b);
+    });
+  }
+  desenharFavoritas();
+
+  // Preferências por papel: guardadas neste navegador (a API guarda depois)
+  const CHAVE_CFG = 'sh_cfg_' + SH_USER_PERFIL.email;
+  let cfgSalva = {}; try { cfgSalva = JSON.parse(localStorage.getItem(CHAVE_CFG)) || {}; } catch (e) {}
+  document.querySelectorAll('[data-cfg]').forEach(el => {
+    if (!(el.dataset.cfg in cfgSalva)) return;
+    if (el.type === 'checkbox') el.checked = !!cfgSalva[el.dataset.cfg]; else el.value = cfgSalva[el.dataset.cfg];
+  });
+
   // Simulação local: salva as alterações no localStorage (sem backend real)
   document.getElementById('form-config').addEventListener('submit', function (e) {
     e.preventDefault();
     const user = shGetUser();
     user.nome = document.getElementById('sh-input-nome').value.trim() || user.nome;
     user.email = document.getElementById('sh-input-email').value.trim() || user.email;
+    const cfg = {}; document.querySelectorAll('[data-cfg]').forEach(el => { cfg[el.dataset.cfg] = el.type === 'checkbox' ? el.checked : el.value; });
+    try { localStorage.setItem(CHAVE_CFG, JSON.stringify(cfg)); } catch (e) {}
     const salvou = shSaveUser(user);
     shAplicarUsuario(user); // atualiza a tela na hora, sem precisar recarregar
 

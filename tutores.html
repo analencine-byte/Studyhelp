@@ -18,11 +18,15 @@
       StudyHelp
     </a>
     <div class="d-none d-lg-flex gap-1">
-      <a href="aluno.html" class="sh-nav-link">Início</a>
+      <a href="index.html" class="sh-nav-link sh-link-inicio">Início</a>
       <a href="materiais.html" class="sh-nav-link">Matérias</a>
       <a href="tutores.html" class="sh-nav-link active">Tutores</a>
     </div>
-    <div class="dropdown">
+    <div id="sh-nav-visitante" class="d-flex align-items-center gap-2">
+      <a href="login.html" class="btn btn-sh-outline btn-sm">Entrar</a>
+      <a href="login.html#cadastro" class="btn btn-sh-primary btn-sm">Cadastre-se</a>
+    </div>
+    <div id="sh-nav-logado" class="dropdown d-none">
       <div class="d-flex align-items-center gap-2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
         <img src="https://i.pravatar.cc/80?img=47" class="sh-avatar sh-user-avatar" style="width:36px;height:36px">
         <span style="font-size:.9rem">Olá, <span class="sh-user-firstname">Ana</span></span>
@@ -37,6 +41,16 @@
     </div>
   </div>
 </nav>
+
+<div class="container mt-4 sh-somente-visitante">
+  <div class="sh-card p-3 d-flex align-items-center gap-3" style="background:#FFF8E1;border-color:#F5E1A0">
+    <i class="bi bi-info-circle-fill fs-4" style="color:#B98900"></i>
+    <div>
+      <div class="fw-semibold">Você está navegando como visitante</div>
+      <div class="sh-muted" style="font-size:.9rem">Dá pra olhar os tutores disponíveis, mas pra conversar com eles é preciso ter conta. <a href="login.html#cadastro" style="color:var(--sh-green-dark);font-weight:500">Cadastre-se agora</a></div>
+    </div>
+  </div>
+</div>
 
 <div class="container mt-4">
   <h1 class="h4 mb-1">Tutores disponíveis</h1>
@@ -67,13 +81,27 @@
   </nav>
 </div>
 
+<!-- AVISO PARA VISITANTE: aparece no lugar do chat quando não tem conta -->
+<div class="modal fade" id="modalBloqueado" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-4" style="border-radius:14px">
+      <i class="bi bi-lock-fill fs-1 mb-2" style="color:var(--sh-green-dark)"></i>
+      <h5 class="mb-2">Crie sua conta para continuar</h5>
+      <p class="sh-muted mb-3" style="font-size:.9rem">Cadastre-se gratuitamente para conversar com tutores, tirar dúvidas e muito mais.</p>
+      <div class="d-flex gap-2 justify-content-center">
+        <a href="login.html" class="btn btn-sh-outline btn-sm">Entrar</a>
+        <a href="login.html#cadastro" class="btn btn-sh-primary btn-sm">Cadastre-se</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer class="sh-footer mt-4">
   <div class="container text-center">© 2026 StudyHelp. Todos os direitos reservados.</div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="app.js"></script>
-<script>shExigirLogin();</script>
 <script>
   // ==========================================================
   // Lista de tutores "de mentira" pra dar volume suficiente pra
@@ -144,9 +172,16 @@
             </div>
           </div>
           <p class="sh-muted mt-2 mb-2" style="font-size:.85rem">${t.desc}</p>
-          <a href="${linkChat}" class="btn btn-sh-outline btn-sm w-100">Ver perfil</a>
+          <button class="btn btn-sh-outline btn-sm w-100 btn-ver-perfil" data-chat="${linkChat}">Ver perfil</button>
         </div>`;
       lista.appendChild(col);
+    });
+
+    lista.querySelectorAll('.btn-ver-perfil').forEach(btn => {
+      btn.addEventListener('click', function () {
+        if (!shExigirLoginParaAcao()) return;
+        window.location.href = this.dataset.chat;
+      });
     });
 
     renderizarPaginacao(totalPaginas);

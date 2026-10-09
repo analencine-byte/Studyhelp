@@ -93,7 +93,7 @@
       <div class="col-6 col-md-3">
         <div class="sh-card p-3">
           <div class="sh-muted" style="font-size:.8rem">Matérias favoritas</div>
-          <div class="h4 mb-0">6</div>
+          <div class="h4 mb-0" id="kpi-favoritas">6</div>
         </div>
       </div>
     </div>
@@ -127,9 +127,10 @@
         <div class="sh-card p-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="h6 mb-0">Minhas atividades recentes</h2>
-            <a href="#" class="sh-nav-link">Ver todos</a>
+            <a href="perfil.html#atividades" class="sh-nav-link">Ver todos</a>
           </div>
-          <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+          <div id="lista-atividades-recentes"></div>
+          <div class="d-none"><div class="d-flex justify-content-between align-items-center py-2 border-bottom">
             <div>
               <div class="fw-semibold" style="font-size:.9rem">Dúvida sobre Funções do 1º grau</div>
               <div class="sh-muted" style="font-size:.8rem">Matemática · 22/05/2026</div>
@@ -149,6 +150,7 @@
               <div class="sh-muted" style="font-size:.8rem">Matemática · 18/05/2026</div>
             </div>
             <span class="sh-pill">Respondida</span>
+          </div>
           </div>
         </div>
       </div>
@@ -214,6 +216,10 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="app.js"></script>
 <script>shExigirLogin();</script>
+<script>
+  shRenderizarAtividades('#lista-atividades-recentes', 3);
+  document.getElementById('kpi-favoritas').textContent = shGetMateriasFavoritas().length;
+</script>
 <script>
   const cardDuvida = document.getElementById('duvidas');
   document.getElementById('btn-toggle-duvida').addEventListener('click', function () {

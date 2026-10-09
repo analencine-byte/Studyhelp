@@ -49,22 +49,22 @@
 
 <div class="sh-dashboard-layout">
   <div class="sh-sidebar p-3">
-    <a href="index.html" class="sh-side-link mb-1"><i class="bi bi-house-door"></i> Início</a>
-    <a href="professor.html" class="sh-side-link active mb-1"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
-    <a href="#materias" class="sh-side-link mb-1"><i class="bi bi-journal-text"></i> Minhas matérias</a>
-    <a href="#publicar" class="sh-side-link mb-1"><i class="bi bi-cloud-upload"></i> Publicar material</a>
+    <a href="index.html" class="sh-side-link mb-1 sh-link-inicio"><i class="bi bi-house-door"></i> Início</a>
+    <a href="#" class="sh-side-link active mb-1 sh-side-tab" data-view="dashboard"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+    <a href="#" class="sh-side-link mb-1 sh-side-tab" data-view="materias"><i class="bi bi-journal-text"></i> Minhas matérias</a>
+    <a href="#" class="sh-side-link mb-1 sh-side-tab" data-view="publicar"><i class="bi bi-cloud-upload"></i> Publicar material</a>
     <a href="chat.html" class="sh-side-link mb-1"><i class="bi bi-chat-dots"></i> Fórum / Chat</a>
-    <a href="#alunos" class="sh-side-link mb-1"><i class="bi bi-people"></i> Alunos</a>
+    <a href="#" class="sh-side-link mb-1 sh-side-tab" data-view="alunos"><i class="bi bi-people"></i> Alunos</a>
     <a href="perfil.html" class="sh-side-link mb-1"><i class="bi bi-person"></i> Perfil</a>
     <hr>
     <a href="index.html" class="sh-side-link" onclick="shLogout()"><i class="bi bi-box-arrow-right"></i> Sair</a>
   </div>
 
   <div class="flex-grow-1 p-4" style="background:#FBFCFA">
-    <h1 class="h4 mb-1">Olá, <span class="sh-user-firstname">Professor</span>! 👋</h1>
-    <p class="sh-muted mb-4">Cria, publica e gerencia matérias e conteúdos.</p>
+    <h1 class="h4 mb-1" id="titulo-secao">Olá, <span class="sh-user-firstname">Professor</span>! 👋</h1>
+    <p class="sh-muted mb-4" id="subtitulo-secao">Cria, publica e gerencia matérias e conteúdos.</p>
 
-    <div class="row g-3 mb-4">
+    <div class="row g-3 mb-4" data-secao="dashboard">
       <div class="col-6 col-md-3">
         <div class="sh-card p-3"><div class="sh-muted" style="font-size:.8rem">Matérias publicadas</div><div class="h4 mb-0" id="kpi-materias-professor">5</div></div>
       </div>
@@ -82,7 +82,7 @@
     <div class="row g-3">
       <!-- MINHAS MATÉRIAS -->
       <div class="col-lg-7">
-        <div class="sh-card p-4 mb-3" id="materias">
+        <div class="sh-card p-4 mb-3" id="materias" data-secao="dashboard materias">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="h6 mb-0">Minhas matérias</h2>
             <button class="btn btn-sh-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalMateria"><i class="bi bi-plus-lg"></i> Nova matéria</button>
@@ -93,7 +93,7 @@
           </table>
         </div>
 
-        <div class="sh-card p-4">
+        <div class="sh-card p-4" data-secao="dashboard">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="h6 mb-0">Conteúdos recentes</h2>
             <a href="materiais.html" class="sh-nav-link">Ver todos</a>
@@ -115,7 +115,7 @@
 
       <!-- PUBLICAR MATERIAL -->
       <div class="col-lg-5">
-        <div class="sh-card p-4 mb-3" id="publicar">
+        <div class="sh-card p-4 mb-3" id="publicar" data-secao="dashboard publicar">
           <h2 class="h6 mb-3">Publicar novo material</h2>
           <form id="form-publicar">
             <div class="mb-2">
@@ -147,16 +147,9 @@
           </form>
         </div>
 
-        <div class="sh-card p-4" id="alunos">
-          <h2 class="h6 mb-3">Últimos alunos ativos</h2>
-          <div class="d-flex align-items-center gap-2 py-2 border-bottom">
-            <img src="https://i.pravatar.cc/80?img=47" class="sh-avatar">
-            <div><div class="fw-semibold" style="font-size:.88rem">Ana Fernanda</div><div class="sh-muted" style="font-size:.78rem">Matemática</div></div>
-          </div>
-          <div class="d-flex align-items-center gap-2 py-2">
-            <img src="https://i.pravatar.cc/80?img=15" class="sh-avatar">
-            <div><div class="fw-semibold" style="font-size:.88rem">Pedro Henrique</div><div class="sh-muted" style="font-size:.78rem">Física</div></div>
-          </div>
+        <div class="sh-card p-4" id="alunos" data-secao="dashboard alunos">
+          <h2 class="h6 mb-3">Meus alunos</h2>
+          <div id="lista-alunos-professor"></div>
         </div>
       </div>
     </div>
@@ -178,6 +171,27 @@
       <div class="modal-footer">
         <button class="btn btn-sh-outline btn-sm" data-bs-dismiss="modal">Cancelar</button>
         <button class="btn btn-sh-primary btn-sm" id="btn-criar-materia-professor">Criar matéria</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR MATÉRIA -->
+<div class="modal fade" id="modalEditarMateria" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content" style="border-radius:14px">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar matéria</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label fw-semibold" style="font-size:.88rem">Nome da matéria</label>
+        <input class="form-control sh-search" id="editar-materia-nome" placeholder="Ex: Geografia">
+        <input type="hidden" id="editar-materia-indice">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-sh-outline btn-sm" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-sh-primary btn-sm" id="btn-salvar-edicao-materia">Salvar</button>
       </div>
     </div>
   </div>
@@ -255,10 +269,22 @@
         <td><i class="bi ${m.icone} me-1" style="color:${m.cor}"></i> ${m.nome}</td>
         <td>${m.conteudos} conteúdos</td>
         <td>${m.alunos} alunos</td>
-        <td class="text-end"><i class="bi bi-pencil sh-muted me-2" style="cursor:pointer"></i><i class="bi bi-trash text-danger" style="cursor:pointer" data-del-materia="${i}"></i></td>`;
+        <td class="text-end"><i class="bi bi-pencil sh-muted me-2" style="cursor:pointer" data-editar-materia="${i}" title="Editar matéria"></i><i class="bi bi-trash text-danger" style="cursor:pointer" data-del-materia="${i}" title="Excluir matéria"></i></td>`;
       corpo.appendChild(tr);
     });
 
+    // Editar (lápis): abre o mesmo tipo de modal da criação, já preenchido
+    document.querySelectorAll('[data-editar-materia]').forEach(icon => {
+      icon.addEventListener('click', function () {
+        const idx = parseInt(this.dataset.editarMateria, 10);
+        const materia = shGetMateriasProfessor()[idx];
+        document.getElementById('editar-materia-nome').value = materia.nome;
+        document.getElementById('editar-materia-indice').value = idx;
+        new bootstrap.Modal(document.getElementById('modalEditarMateria')).show();
+      });
+    });
+
+    // Excluir (lixeira)
     document.querySelectorAll('[data-del-materia]').forEach(icon => {
       icon.addEventListener('click', function () {
         if (!confirm('Remover essa matéria?')) return;
@@ -270,6 +296,17 @@
       });
     });
   }
+
+  document.getElementById('btn-salvar-edicao-materia').addEventListener('click', function () {
+    const idx = parseInt(document.getElementById('editar-materia-indice').value, 10);
+    const nome = document.getElementById('editar-materia-nome').value.trim();
+    if (!nome) { alert('Escreva o nome da matéria.'); return; }
+    const lista = shGetMateriasProfessor();
+    lista[idx].nome = nome;
+    shSalvarMateriasProfessor(lista);
+    bootstrap.Modal.getInstance(document.getElementById('modalEditarMateria')).hide();
+    renderMateriasProfessor();
+  });
 
   document.getElementById('btn-criar-materia-professor').addEventListener('click', function () {
     const nome = document.getElementById('nova-materia-professor-nome').value.trim();
@@ -283,6 +320,73 @@
   });
 
   renderMateriasProfessor();
+
+  // ==========================================================
+  // Alunos matriculados nas matérias do professor — mostra nome
+  // e em qual matéria cada um está inscrito (o que o botão "Alunos"
+  // deve exibir). Simulação local; no backend viria de uma consulta
+  // juntando alunos + inscrições.
+  // ==========================================================
+  const shAlunosProfessor = [
+    { nome: 'Ana Fernanda', materia: 'Matemática', foto: 47 },
+    { nome: 'Pedro Henrique', materia: 'Física', foto: 15 },
+    { nome: 'Mariana Souza', materia: 'Matemática', foto: 23 },
+    { nome: 'Bruno Castro', materia: 'Química', foto: 8 },
+    { nome: 'Camila Duarte', materia: 'Física', foto: 44 },
+    { nome: 'Eduardo Nunes', materia: 'Matemática', foto: 6 },
+    { nome: 'Larissa Prado', materia: 'Química', foto: 36 }
+  ];
+
+  function renderAlunosProfessor() {
+    const lista = document.getElementById('lista-alunos-professor');
+    lista.innerHTML = shAlunosProfessor.map((a, i) => `
+      <div class="d-flex align-items-center gap-2 py-2${i < shAlunosProfessor.length - 1 ? ' border-bottom' : ''}">
+        <img src="https://i.pravatar.cc/80?img=${a.foto}" class="sh-avatar">
+        <div><div class="fw-semibold" style="font-size:.88rem">${a.nome}</div><div class="sh-muted" style="font-size:.78rem">${a.materia}</div></div>
+      </div>`).join('');
+  }
+  renderAlunosProfessor();
+
+  // ==========================================================
+  // Abas do painel: "Dashboard" mostra tudo junto (como sempre foi);
+  // as outras abas (Minhas matérias / Publicar material / Alunos)
+  // isolam só a atividade correspondente, em vez de só rolar a tela
+  // até a mesma seção.
+  // ==========================================================
+  const shTitulosSecao = {
+    dashboard: ['Olá, <span class="sh-user-firstname">Professor</span>! 👋', 'Cria, publica e gerencia matérias e conteúdos.'],
+    materias: ['Minhas matérias', 'Crie, edite e remova as matérias que você leciona.'],
+    publicar: ['Publicar material', 'Envie vídeos, PDFs e exercícios pra suas matérias.'],
+    alunos: ['Meus alunos', 'Veja quem está matriculado em cada uma das suas matérias.']
+  };
+
+  function shMostrarSecaoProfessor(secao) {
+    document.querySelectorAll('[data-secao]').forEach(el => {
+      const tags = el.dataset.secao.split(' ');
+      const mostra = secao === 'dashboard' ? tags.includes('dashboard') : tags.includes(secao);
+      el.classList.toggle('d-none', !mostra);
+    });
+    document.querySelectorAll('.sh-side-tab').forEach(a => a.classList.toggle('active', a.dataset.view === secao));
+
+    const [titulo, subtitulo] = shTitulosSecao[secao] || shTitulosSecao.dashboard;
+    document.getElementById('titulo-secao').innerHTML = titulo;
+    document.getElementById('subtitulo-secao').textContent = subtitulo;
+
+    if (history.replaceState) history.replaceState(null, '', '#' + secao);
+  }
+
+  document.querySelectorAll('.sh-side-tab').forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      shMostrarSecaoProfessor(this.dataset.view);
+    });
+  });
+
+  // Se a pessoa chegou por um link direto (ex: professor.html#materias), já abre na aba certa
+  const secaoInicial = ['materias', 'publicar', 'alunos'].includes(window.location.hash.replace('#', ''))
+    ? window.location.hash.replace('#', '')
+    : 'dashboard';
+  shMostrarSecaoProfessor(secaoInicial);
 </script>
 </body>
 </html>

@@ -23,11 +23,15 @@
       StudyHelp
     </a>
     <div class="d-none d-lg-flex gap-1">
-      <a href="aluno.html" class="sh-nav-link">Início</a>
+      <a href="index.html" class="sh-nav-link sh-link-inicio">Início</a>
       <a href="materiais.html" class="sh-nav-link">Matérias</a>
       <a href="chat.html" class="sh-nav-link active">Chat</a>
     </div>
-    <div class="dropdown">
+    <div id="sh-nav-visitante" class="d-flex align-items-center gap-2">
+      <a href="login.html" class="btn btn-sh-outline btn-sm">Entrar</a>
+      <a href="login.html#cadastro" class="btn btn-sh-primary btn-sm">Cadastre-se</a>
+    </div>
+    <div id="sh-nav-logado" class="dropdown d-none">
       <div class="d-flex align-items-center gap-2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
         <img src="https://i.pravatar.cc/80?img=47" class="sh-avatar sh-user-avatar" style="width:36px;height:36px">
         <span style="font-size:.9rem">Olá, <span class="sh-user-firstname">Ana</span></span>
@@ -43,7 +47,20 @@
   </div>
 </nav>
 
-<div class="container-fluid mt-3 px-4">
+<!-- VISITANTE: em vez de redirecionar sem avisar, mostra a tela de bloqueio explicando o motivo -->
+<div class="container mt-5 sh-somente-visitante">
+  <div class="sh-card p-5 text-center mx-auto" style="max-width:420px">
+    <i class="bi bi-lock-fill fs-1 mb-2" style="color:var(--sh-green-dark)"></i>
+    <h5 class="mb-2">Crie sua conta para continuar</h5>
+    <p class="sh-muted mb-3" style="font-size:.9rem">O chat com tutores e o suporte são exclusivos para quem tem conta no StudyHelp. Cadastre-se gratuitamente ou entre na sua conta.</p>
+    <div class="d-flex gap-2 justify-content-center">
+      <a href="login.html" class="btn btn-sh-outline btn-sm">Entrar</a>
+      <a href="login.html#cadastro" class="btn btn-sh-primary btn-sm">Cadastre-se</a>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt-3 px-4 sh-somente-logado">
   <div class="row g-3">
 
     <!-- LISTA DE CONVERSAS -->
@@ -82,7 +99,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="app.js"></script>
-<script>shExigirLogin();</script>
 <script>
   // ==========================================================
   // Simulação de múltiplas conversas. Cada contato tem seu próprio
