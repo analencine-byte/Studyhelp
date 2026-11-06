@@ -1,0 +1,11 @@
+<?php
+// Copie este arquivo para config.local.php (na mesma pasta) e preencha com os dados do
+// MySQL que a hospedagem mostra no painel. Esse arquivo NÃO deve ir pro GitHub.
+return [
+    'host'   => 'sqlXXX.infinityfree.com',   // "MySQL Host Name" do painel
+    'banco'  => 'if0_XXXXXXXX_studyhelp',    // nome completo do banco (com o prefixo)
+    'user'   => 'if0_XXXXXXXX',              // "MySQL User Name"
+    'senha'  => 'SENHA_DA_CONTA_HOSPEDAGEM', // senha do painel (vPanel)
+    'chave_instalacao' => 'invente-uma-frase-longa-aqui',
+    'senha_admin' => 'escolha-a-senha-do-admin', // senha do admin@studyhelp.com
+];

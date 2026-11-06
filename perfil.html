@@ -73,21 +73,21 @@
             <div class="sh-muted sh-user-email" style="font-size:.88rem">ana.fernanda@email.com</div>
             <div class="sh-muted sh-user-membro-desde" style="font-size:.8rem"></div>
           </div>
-          <button class="btn btn-sh-outline btn-sm">Editar perfil</button>
+          <a href="#config" class="btn btn-sh-outline btn-sm sh-perfil-tab" data-view="config">Editar perfil</a>
         </div>
 
         <div class="row g-3 text-center">
           <div class="col-6 col-md-3">
-            <div class="sh-card p-3"><div class="sh-muted" style="font-size:.78rem">Dúvidas enviadas</div><div class="h5 mb-0">12</div></div>
+            <div class="sh-card p-3"><div class="sh-muted" id="st1-l" style="font-size:.78rem">Dúvidas enviadas</div><div class="h5 mb-0" id="st1">–</div></div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="sh-card p-3"><div class="sh-muted" style="font-size:.78rem">Materiais acessados</div><div class="h5 mb-0">28</div></div>
+            <div class="sh-card p-3"><div class="sh-muted" id="st2-l" style="font-size:.78rem">Materiais acessados</div><div class="h5 mb-0" id="st2">–</div></div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="sh-card p-3"><div class="sh-muted" style="font-size:.78rem">Cadernos criados</div><div class="h5 mb-0">5</div></div>
+            <div class="sh-card p-3"><div class="sh-muted" id="st3-l" style="font-size:.78rem">Cadernos criados</div><div class="h5 mb-0" id="st3">–</div></div>
           </div>
           <div class="col-6 col-md-3">
-            <div class="sh-card p-3"><div class="sh-muted" style="font-size:.78rem">Avaliação média dada</div><div class="h5 mb-0">4.8 <i class="bi bi-star-fill text-warning" style="font-size:.7em"></i></div></div>
+            <div class="sh-card p-3"><div class="sh-muted" id="st4-l" style="font-size:.78rem">Matérias favoritas</div><div class="h5 mb-0" id="st4">–</div></div>
           </div>
         </div>
       </div>
@@ -118,9 +118,15 @@
               <input id="sh-input-email" class="form-control sh-search">
             </div>
           </div>
-          <div class="mb-3">
-            <label class="form-label fw-semibold" style="font-size:.88rem">Nova senha</label>
-            <input type="password" class="form-control sh-search" placeholder="Deixe em branco para manter a atual">
+          <div class="row g-2 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:.88rem">Senha atual <span class="sh-muted fw-normal">(só se for trocar email ou senha)</span></label>
+              <input type="password" id="cfg-senha-atual" class="form-control sh-search" autocomplete="current-password">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:.88rem">Nova senha</label>
+              <input type="password" id="cfg-nova-senha" class="form-control sh-search" placeholder="Deixe em branco para manter a atual" autocomplete="new-password">
+            </div>
           </div>
 
           <div class="sh-cfg sh-cfg-Aluno">
@@ -147,6 +153,7 @@
             <a href="admin-config.html" class="btn btn-sh-outline btn-sm mb-2">Configurações da plataforma</a>
           </div>
 
+          <div id="cfg-erro" class="text-danger d-none mt-2" style="font-size:.85rem"></div>
           <div><button class="btn btn-sh-primary btn-sm mt-2" type="submit">Salvar alterações</button></div>
         </form>
       </div>
@@ -183,52 +190,95 @@
 
   shRenderizarAtividades('#lista-atividades');
 
+  // ===== Números do topo (variam conforme o tipo de conta) =====
+  async function carregarNumeros() {
+    const r = await shApi('usuarios.php', { acao: 'estatisticas' });
+    if (!r.ok) return;
+    const set = (i, rot, val) => { document.getElementById('st' + i + '-l').textContent = rot; document.getElementById('st' + i).textContent = val; };
+    if (SH_USER_PERFIL.papel === 'Aluno') {
+      set(1, 'Dúvidas enviadas', r.duvidas); set(2, 'Materiais acessados', r.materiaisAcessados); set(3, 'Cadernos criados', r.cadernos); set(4, 'Matérias favoritas', r.favoritas);
+    } else if (SH_USER_PERFIL.papel === 'Tutor') {
+      set(1, 'Matérias', r.materias); set(2, 'Alunos', r.alunos); set(3, 'Materiais publicados', r.materiais); set(4, 'Mensagens recebidas', r.mensagens);
+    } else {
+      document.getElementById('st1').closest('.row').classList.add('d-none');
+    }
+  }
+  carregarNumeros();
+
+  // ===== Matérias favoritas =====
+  let nomesMaterias = [];
+  async function iniciarFavoritas() {
+    if (!SH_E_ALUNO) return;
+    [nomesMaterias] = await Promise.all([shNomesMaterias(), shCarregarMinhasMaterias()]);
+    desenharFavoritas();
+  }
   function desenharFavoritas() {
     const favs = shGetMateriasFavoritas();
     const alvo = document.getElementById('lista-favoritas'); alvo.innerHTML = '';
-    SH_TODAS_MATERIAS.forEach(m => {
+    nomesMaterias.forEach(m => {
       const ativo = favs.includes(m);
       const b = document.createElement('button'); b.type = 'button';
       b.className = 'btn btn-sm ' + (ativo ? 'btn-sh-primary' : 'btn-sh-outline');
       b.innerHTML = '<i class="bi ' + (ativo ? 'bi-star-fill' : 'bi-star') + ' me-1"></i>';
       b.append(m);
-      b.addEventListener('click', () => {
+      b.addEventListener('click', async () => {
         const atual = shGetMateriasFavoritas();
-        shSalvarMateriasFavoritas(atual.includes(m) ? atual.filter(x => x !== m) : atual.concat(m));
+        await shSalvarMateriasFavoritas(atual.includes(m) ? atual.filter(x => x !== m) : atual.concat(m));
         desenharFavoritas();
+        carregarNumeros();
       });
       alvo.appendChild(b);
     });
   }
-  desenharFavoritas();
+  iniciarFavoritas();
 
-  // Preferências por papel: guardadas neste navegador (a API guarda depois)
-  const CHAVE_CFG = 'sh_cfg_' + SH_USER_PERFIL.email;
-  let cfgSalva = {}; try { cfgSalva = JSON.parse(localStorage.getItem(CHAVE_CFG)) || {}; } catch (e) {}
-  document.querySelectorAll('[data-cfg]').forEach(el => {
-    if (!(el.dataset.cfg in cfgSalva)) return;
-    if (el.type === 'checkbox') el.checked = !!cfgSalva[el.dataset.cfg]; else el.value = cfgSalva[el.dataset.cfg];
-  });
+  // ===== Preferências por tipo de conta (guardadas no servidor) =====
+  // tutor_bio e tutor_disponivel têm colunas próprias; o resto vai no campo "config".
+  function preencherConfig(u) {
+    const cfg = u.config || {};
+    document.querySelectorAll('[data-cfg]').forEach(el => {
+      let v = cfg[el.dataset.cfg];
+      if (el.dataset.cfg === 'tutor_bio') v = u.bio || '';
+      if (el.dataset.cfg === 'tutor_disponivel') v = u.disponivel;
+      if (v === undefined) return;
+      if (el.type === 'checkbox') el.checked = !!v; else el.value = v;
+    });
+  }
+  preencherConfig(SH_USER_PERFIL);
 
-  // Simulação local: salva as alterações no localStorage (sem backend real)
-  document.getElementById('form-config').addEventListener('submit', function (e) {
+  document.getElementById('form-config').addEventListener('submit', async function (e) {
     e.preventDefault();
-    const user = shGetUser();
-    user.nome = document.getElementById('sh-input-nome').value.trim() || user.nome;
-    user.email = document.getElementById('sh-input-email').value.trim() || user.email;
-    const cfg = {}; document.querySelectorAll('[data-cfg]').forEach(el => { cfg[el.dataset.cfg] = el.type === 'checkbox' ? el.checked : el.value; });
-    try { localStorage.setItem(CHAVE_CFG, JSON.stringify(cfg)); } catch (e) {}
-    const salvou = shSaveUser(user);
-    shAplicarUsuario(user); // atualiza a tela na hora, sem precisar recarregar
+    const erro = document.getElementById('cfg-erro');
+    erro.classList.add('d-none');
+    const cfg = {};
+    let bio, disponivel;
+    document.querySelectorAll('[data-cfg]').forEach(el => {
+      const v = el.type === 'checkbox' ? el.checked : el.value;
+      if (el.dataset.cfg === 'tutor_bio') bio = v;
+      else if (el.dataset.cfg === 'tutor_disponivel') disponivel = v;
+      else if (el.closest('.sh-cfg') && !el.closest('.sh-cfg').classList.contains('d-none')) cfg[el.dataset.cfg] = v;
+    });
+    const corpo = {
+      nome: document.getElementById('sh-input-nome').value.trim() || SH_USER_PERFIL.nome,
+      email: document.getElementById('sh-input-email').value.trim() || SH_USER_PERFIL.email,
+      config: cfg
+    };
+    if (bio !== undefined && SH_USER_PERFIL.papel === 'Tutor') { corpo.bio = bio; corpo.disponivel = disponivel; }
+    const senhaAtual = document.getElementById('cfg-senha-atual').value;
+    const nova = document.getElementById('cfg-nova-senha').value;
+    if (senhaAtual) corpo.senhaAtual = senhaAtual;
+    if (nova) corpo.novaSenha = nova;
 
-    if (salvou) {
-      alert('Alterações salvas neste navegador. Quando o backend estiver pronto, isso vai gravar no banco de dados.');
-    } else {
-      alert('A tela foi atualizada, mas seu navegador bloqueou o armazenamento — ao recarregar a página, os dados antigos podem voltar. Rode o projeto por um servidor local (XAMPP) pra resolver isso de vez.');
-    }
+    const r = await shApi('usuarios.php', { acao: 'perfil', corpo });
+    if (!r.ok) { erro.textContent = r.erro || 'Não foi possível salvar.'; erro.classList.remove('d-none'); return; }
+    shGuardarUsuario(r.usuario);
+    shAplicarUsuario(r.usuario);
+    document.getElementById('cfg-senha-atual').value = '';
+    document.getElementById('cfg-nova-senha').value = '';
+    alert('Alterações salvas!');
   });
 
-  // Trocar foto de perfil — lê a imagem escolhida e guarda como base64 (simulação, sem backend)
+  // ===== Trocar foto de perfil (vai pro servidor) =====
   document.getElementById('btn-trocar-foto').addEventListener('click', function () {
     document.getElementById('input-foto').click();
   });
@@ -236,25 +286,14 @@
   document.getElementById('input-foto').addEventListener('change', function () {
     const arquivo = this.files[0];
     if (!arquivo) return;
-
-    if (!arquivo.type.startsWith('image/')) {
-      alert('Escolha um arquivo de imagem (jpg, png, etc).');
-      return;
-    }
-    if (arquivo.size > 1.5 * 1024 * 1024) {
-      alert('Essa imagem é grande demais para essa simulação (limite de 1.5 MB no protótipo). Escolha uma foto menor.');
-      return;
-    }
-
+    if (!/^image\/(png|jpeg|gif|webp)$/.test(arquivo.type)) { alert('Escolha uma imagem png, jpg, gif ou webp.'); return; }
+    if (arquivo.size > 1.4 * 1024 * 1024) { alert('Essa imagem é grande demais (limite de 1,4 MB). Escolha uma foto menor.'); return; }
     const leitor = new FileReader();
-    leitor.onload = function (ev) {
-      const user = shGetUser();
-      user.avatar = ev.target.result; // imagem em base64
-      const salvou = shSaveUser(user);
-      shAplicarUsuario(user);
-      if (!salvou) {
-        alert('A foto apareceu na tela, mas o navegador bloqueou o armazenamento — pode voltar ao padrão se você recarregar a página. Rode por um servidor local (XAMPP) pra resolver.');
-      }
+    leitor.onload = async function (ev) {
+      const r = await shApi('usuarios.php', { acao: 'perfil', corpo: { avatar: ev.target.result } });
+      if (shErroApi(r)) return;
+      shGuardarUsuario(r.usuario);
+      shAplicarUsuario(r.usuario);
     };
     leitor.readAsDataURL(arquivo);
   });

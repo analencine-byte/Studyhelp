@@ -75,25 +75,25 @@
       <div class="col-6 col-md-3">
         <div class="sh-card p-3">
           <div class="sh-muted" style="font-size:.8rem">Dúvidas enviadas</div>
-          <div class="h4 mb-0">12</div>
+          <div class="h4 mb-0" id="kpi-duvidas">–</div>
         </div>
       </div>
       <div class="col-6 col-md-3">
         <div class="sh-card p-3">
           <div class="sh-muted" style="font-size:.8rem">Materiais acessados</div>
-          <div class="h4 mb-0">28</div>
+          <div class="h4 mb-0" id="kpi-materiais">–</div>
         </div>
       </div>
       <div class="col-6 col-md-3">
         <div class="sh-card p-3">
           <div class="sh-muted" style="font-size:.8rem">Cadernos criados</div>
-          <div class="h4 mb-0">5</div>
+          <div class="h4 mb-0" id="kpi-cadernos">–</div>
         </div>
       </div>
       <div class="col-6 col-md-3">
         <div class="sh-card p-3">
           <div class="sh-muted" style="font-size:.8rem">Matérias favoritas</div>
-          <div class="h4 mb-0" id="kpi-favoritas">6</div>
+          <div class="h4 mb-0" id="kpi-favoritas">–</div>
         </div>
       </div>
     </div>
@@ -106,20 +106,19 @@
             <h2 class="h6 mb-0">Solicitar ajuda</h2>
             <button type="button" class="btn-close" id="btn-fechar-duvida"></button>
           </div>
-          <form onsubmit="event.preventDefault(); alert('Dúvida enviada (simulação) — conectar ao backend.'); document.getElementById('duvidas').classList.add('d-none'); this.reset();">
+          <form id="form-duvida">
             <div class="row g-2 mb-2">
               <div class="col-md-6">
-                <select class="form-select sh-search">
-                  <option>Matemática</option><option>Português</option><option>Ciências</option><option>História</option><option>Inglês</option>
-                </select>
+                <select class="form-select sh-search" id="duvida-materia"><option>Matemática</option></select>
               </div>
               <div class="col-md-6">
-                <select class="form-select sh-search">
+                <select class="form-select sh-search" id="duvida-tipo">
                   <option>Dúvida rápida</option><option>Correção de exercício</option><option>Explicação de conteúdo</option>
                 </select>
               </div>
             </div>
-            <textarea class="form-control sh-search mb-2" rows="3" placeholder="Descreva sua dúvida..." required></textarea>
+            <textarea class="form-control sh-search mb-2" id="duvida-texto" rows="3" placeholder="Descreva sua dúvida..." required maxlength="2000"></textarea>
+            <div id="duvida-erro" class="text-danger d-none mb-2" style="font-size:.82rem"></div>
             <button class="btn btn-sh-primary btn-sm" type="submit">Enviar dúvida</button>
           </form>
         </div>
@@ -130,28 +129,6 @@
             <a href="perfil.html#atividades" class="sh-nav-link">Ver todos</a>
           </div>
           <div id="lista-atividades-recentes"></div>
-          <div class="d-none"><div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-            <div>
-              <div class="fw-semibold" style="font-size:.9rem">Dúvida sobre Funções do 1º grau</div>
-              <div class="sh-muted" style="font-size:.8rem">Matemática · 22/05/2026</div>
-            </div>
-            <span class="sh-pill">Respondida</span>
-          </div>
-          <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-            <div>
-              <div class="fw-semibold" style="font-size:.9rem">Redação: Dissertação argumentativa</div>
-              <div class="sh-muted" style="font-size:.8rem">Português · 20/05/2026</div>
-            </div>
-            <span class="sh-pill warn">Em andamento</span>
-          </div>
-          <div class="d-flex justify-content-between align-items-center py-2">
-            <div>
-              <div class="fw-semibold" style="font-size:.9rem">Exercícios de Frações</div>
-              <div class="sh-muted" style="font-size:.8rem">Matemática · 18/05/2026</div>
-            </div>
-            <span class="sh-pill">Respondida</span>
-          </div>
-          </div>
         </div>
       </div>
 
@@ -162,30 +139,7 @@
             <h2 class="h6 mb-0">Tutores disponíveis agora</h2>
             <a href="tutores.html" class="sh-nav-link">Ver todos</a>
           </div>
-          <div class="d-flex gap-2 align-items-center py-2 border-bottom">
-            <img src="https://i.pravatar.cc/80?img=12" class="sh-avatar">
-            <div class="flex-grow-1">
-              <div class="fw-semibold" style="font-size:.9rem">Lucas Oliveira</div>
-              <div class="sh-muted" style="font-size:.8rem">Matemática</div>
-            </div>
-            <a href="chat.html?tutor=lucas" class="btn btn-sh-outline btn-sm">Conversar</a>
-          </div>
-          <div class="d-flex gap-2 align-items-center py-2 border-bottom">
-            <img src="https://i.pravatar.cc/80?img=32" class="sh-avatar">
-            <div class="flex-grow-1">
-              <div class="fw-semibold" style="font-size:.9rem">Juliana Santos</div>
-              <div class="sh-muted" style="font-size:.8rem">Português</div>
-            </div>
-            <a href="chat.html?tutor=juliana" class="btn btn-sh-outline btn-sm">Conversar</a>
-          </div>
-          <div class="d-flex gap-2 align-items-center py-2">
-            <img src="https://i.pravatar.cc/80?img=47" class="sh-avatar">
-            <div class="flex-grow-1">
-              <div class="fw-semibold" style="font-size:.9rem">Carla Menezes</div>
-              <div class="sh-muted" style="font-size:.8rem">Ciências</div>
-            </div>
-            <a href="chat.html?tutor=carla" class="btn btn-sh-outline btn-sm">Conversar</a>
-          </div>
+          <div id="lista-tutores-disponiveis"></div>
         </div>
 
         <div class="sh-card p-4">
@@ -193,20 +147,7 @@
             <h2 class="h6 mb-0">Meus cadernos</h2>
             <a href="cadernos.html" class="sh-nav-link">Ver todos</a>
           </div>
-          <a href="cadernos.html" class="d-flex align-items-center gap-2 py-2 border-bottom text-reset">
-            <div class="sh-icon-badge purple"><i class="bi bi-journal"></i></div>
-            <div>
-              <div class="fw-semibold" style="font-size:.88rem">Matemática</div>
-              <div class="sh-muted" style="font-size:.78rem">Fórmulas e exercícios</div>
-            </div>
-          </a>
-          <a href="cadernos.html" class="d-flex align-items-center gap-2 py-2 text-reset">
-            <div class="sh-icon-badge"><i class="bi bi-journal"></i></div>
-            <div>
-              <div class="fw-semibold" style="font-size:.88rem">Português</div>
-              <div class="sh-muted" style="font-size:.78rem">Figuras de linguagem</div>
-            </div>
-          </a>
+          <div id="lista-cadernos-aluno"></div>
         </div>
       </div>
     </div>
@@ -217,8 +158,65 @@
 <script src="app.js"></script>
 <script>shExigirLogin();</script>
 <script>
-  shRenderizarAtividades('#lista-atividades-recentes', 3);
-  document.getElementById('kpi-favoritas').textContent = shGetMateriasFavoritas().length;
+  shExigirPapel(['Aluno']);
+
+  async function carregarPainelAluno() {
+    shRenderizarAtividades('#lista-atividades-recentes', 3);
+
+    const [st, tut, cad, nomes] = await Promise.all([
+      shApi('usuarios.php', { acao: 'estatisticas' }), shApi('usuarios.php', { acao: 'tutores' }),
+      shApi('cadernos.php'), shNomesMaterias()
+    ]);
+    if (st.ok) {
+      document.getElementById('kpi-duvidas').textContent = st.duvidas;
+      document.getElementById('kpi-materiais').textContent = st.materiaisAcessados;
+      document.getElementById('kpi-cadernos').textContent = st.cadernos;
+      document.getElementById('kpi-favoritas').textContent = st.favoritas;
+    }
+
+    // matérias no formulário de dúvida
+    if (nomes.length) document.getElementById('duvida-materia').innerHTML = nomes.map(n => `<option>${shEsc(n)}</option>`).join('');
+
+    // tutores disponíveis agora (até 3)
+    const disp = (tut.tutores || []).filter(t => t.disponivel).slice(0, 3);
+    document.getElementById('lista-tutores-disponiveis').innerHTML = disp.length ? disp.map((t, i) => `
+      <div class="d-flex gap-2 align-items-center py-2${i < disp.length - 1 ? ' border-bottom' : ''}">
+        <img src="${shEsc(t.avatar || 'https://i.pravatar.cc/80?u=' + t.id)}" class="sh-avatar">
+        <div class="flex-grow-1">
+          <div class="fw-semibold" style="font-size:.9rem">${shEsc(t.nome)}</div>
+          <div class="sh-muted" style="font-size:.8rem">${shEsc(t.materias.map(m => m.nome).join(', ') || 'Tutor')}</div>
+        </div>
+        <a href="chat.html?tutor=${t.id}" class="btn btn-sh-outline btn-sm">Conversar</a>
+      </div>`).join('') : '<p class="sh-muted mb-0" style="font-size:.85rem">Nenhum tutor disponível no momento.</p>';
+
+    // cadernos (até 3)
+    const cads = (cad.cadernos || []).slice(0, 3);
+    document.getElementById('lista-cadernos-aluno').innerHTML = cads.length ? cads.map((c, i) => `
+      <a href="cadernos.html" class="d-flex align-items-center gap-2 py-2${i < cads.length - 1 ? ' border-bottom' : ''} text-reset">
+        <div class="sh-icon-badge${i % 2 === 0 ? ' purple' : ''}"><i class="bi bi-journal"></i></div>
+        <div>
+          <div class="fw-semibold" style="font-size:.88rem">${shEsc(c.titulo)}</div>
+          <div class="sh-muted" style="font-size:.78rem">${shEsc(c.descricao || '')}</div>
+        </div>
+      </a>`).join('') : '<p class="sh-muted mb-0" style="font-size:.85rem">Você ainda não criou cadernos.</p>';
+  }
+  carregarPainelAluno();
+
+  document.getElementById('form-duvida').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const erro = document.getElementById('duvida-erro');
+    erro.classList.add('d-none');
+    const r = await shApi('tarefas.php', { acao: 'duvida', corpo: {
+      materia: document.getElementById('duvida-materia').value,
+      tipo: document.getElementById('duvida-tipo').value,
+      texto: document.getElementById('duvida-texto').value.trim()
+    }});
+    if (!r.ok) { erro.textContent = r.erro || 'Não foi possível enviar.'; erro.classList.remove('d-none'); return; }
+    document.getElementById('duvidas').classList.add('d-none');
+    this.reset();
+    alert(r.tutorId ? 'Dúvida enviada! O tutor da matéria vai responder no chat.' : 'Dúvida registrada. Ainda não há tutor para essa matéria, mas ela fica salva nas suas atividades.');
+    carregarPainelAluno();
+  });
 </script>
 <script>
   const cardDuvida = document.getElementById('duvidas');

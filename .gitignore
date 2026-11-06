@@ -1,1 +1,3 @@
 api/*.sqlite
+api/config.local.php
+api/*.sqlite

@@ -87,11 +87,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="app.js"></script>
 
-<script>
-  // Bloqueia quem digitar essa URL direto sem ter passado pela senha administrativa
-  const u = shGetUser();
-  if (u.papel !== 'Administrador') window.location.href = 'admin-login.html';
-</script>
+<script>shExigirPapel(['Administrador'], 'admin-login.html');</script>
 
 <script>
   function pillPapel(papel) {
@@ -117,26 +113,13 @@
       <div class="col-6 col-md-3"><div class="sh-card p-3"><div class="sh-muted" style="font-size:.8rem">Matérias cadastradas</div><div class="h4 mb-0">${materias}</div></div></div>`;
   }
 
-  function aprovarUsuario(id) {
-    const lista = shGetUsuarios();
-    const u = lista.find(x => x.id === id);
-    if (!u) return;
-    u.status = 'Aprovado';
-    shSalvarUsuarios(lista);
-    shAdicionarAtividade(`${u.nome} foi aprovado(a) como ${u.papel.toLowerCase()}`);
-    const contaAtual = shGetUser();
-    if (contaAtual.email === u.email) shIniciarSessao(u.papel, 'Aprovado');
+  async function mudarStatus(id, status) {
+    if (shErroApi(await shApi('usuarios.php', { acao: 'status', id, corpo: { status } }))) return;
+    await shCarregarAdmin();
     renderTudo();
   }
-  function recusarUsuario(id) {
-    const lista = shGetUsuarios();
-    const u = lista.find(x => x.id === id);
-    if (!u) return;
-    u.status = 'Recusado';
-    shSalvarUsuarios(lista);
-    shAdicionarAtividade(`Cadastro de ${u.nome} foi recusado`);
-    renderTudo();
-  }
+  function aprovarUsuario(id) { return mudarStatus(id, 'Aprovado'); }
+  function recusarUsuario(id) { return mudarStatus(id, 'Recusado'); }
 
   function renderSolicitacoesPreview() {
     const pendentes = shGetUsuarios().filter(u => u.status === 'Pendente');
@@ -154,7 +137,7 @@
       const div = document.createElement('div');
       div.className = 'd-flex justify-content-between align-items-center py-2 border-bottom';
       div.innerHTML = `
-        <div><div class="fw-semibold" style="font-size:.9rem">${u.nome}</div><div class="sh-muted" style="font-size:.78rem">Solicitou como: ${u.papel}</div></div>
+        <div><div class="fw-semibold" style="font-size:.9rem">${shEsc(u.nome)}</div><div class="sh-muted" style="font-size:.78rem">Solicitou como: ${shEsc(u.papel)}</div></div>
         <div class="d-flex gap-1">
           <button class="btn btn-sm btn-sh-primary" data-aprovar="${u.id}"><i class="bi bi-check-lg"></i></button>
           <button class="btn btn-sm btn-outline-danger" data-recusar="${u.id}"><i class="bi bi-x-lg"></i></button>
@@ -177,7 +160,7 @@
       const div = document.createElement('div');
       div.className = 'd-flex justify-content-between align-items-center py-2 border-bottom';
       div.style.fontSize = '.88rem';
-      div.innerHTML = `<span>${t.nome}</span>${pillStatus(t.status)}`;
+      div.innerHTML = `<span>${shEsc(t.nome)}</span>${pillStatus(t.status)}`;
       cont.appendChild(div);
     });
   }
@@ -195,7 +178,7 @@
       div.className = 'd-flex justify-content-between py-2 border-bottom';
       div.style.fontSize = '.85rem';
       div.style.cursor = 'pointer';
-      div.innerHTML = `<span>${a.texto}</span><span class="sh-muted">${a.tempo}</span>`;
+      div.innerHTML = `<span>${shEsc(a.texto)}</span><span class="sh-muted">${shEsc(a.tempo)}</span>`;
       div.addEventListener('click', () => alert(a.texto + '\n\n' + a.tempo));
       cont.appendChild(div);
     });
@@ -207,7 +190,7 @@
     renderTutoresPreview();
     renderAtividadesPreview();
   }
-  renderTudo();
+  shCarregarAdmin().then(ok => { if (ok) renderTudo(); });
 </script>
 </body>
 </html>

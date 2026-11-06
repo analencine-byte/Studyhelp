@@ -47,41 +47,8 @@
     <button class="btn btn-sh-primary" data-bs-toggle="modal" data-bs-target="#modalNovoCaderno"><i class="bi bi-plus-lg"></i> Novo caderno</button>
   </div>
 
-  <div class="row g-3 mt-2" id="lista-cadernos">
-    <!-- cada caderno tem um data-id ÚNICO: é essa chave que separa as anotações de cada um -->
-    <div class="col-6 col-md-4 col-lg-3">
-      <a href="#" class="sh-card d-block p-3 text-reset caderno-item" data-id="matematica" data-titulo="Matemática" data-desc="Fórmulas e exercícios">
-        <div class="sh-icon-badge purple mb-2"><i class="bi bi-journal-bookmark-fill"></i></div>
-        <div class="fw-semibold">Matemática</div>
-        <div class="sh-muted" style="font-size:.82rem">Fórmulas e exercícios</div>
-        <div class="sh-muted mt-2 caderno-atualizado" style="font-size:.75rem">Atualizado em 12/05/2026</div>
-      </a>
-    </div>
-    <div class="col-6 col-md-4 col-lg-3">
-      <a href="#" class="sh-card d-block p-3 text-reset caderno-item" data-id="portugues" data-titulo="Português" data-desc="Figuras de linguagem">
-        <div class="sh-icon-badge mb-2"><i class="bi bi-journal-bookmark-fill"></i></div>
-        <div class="fw-semibold">Português</div>
-        <div class="sh-muted" style="font-size:.82rem">Figuras de linguagem</div>
-        <div class="sh-muted mt-2 caderno-atualizado" style="font-size:.75rem">Atualizado em 10/05/2026</div>
-      </a>
-    </div>
-    <div class="col-6 col-md-4 col-lg-3">
-      <a href="#" class="sh-card d-block p-3 text-reset caderno-item" data-id="ciencias" data-titulo="Ciências" data-desc="Resumo de Biologia">
-        <div class="sh-icon-badge purple mb-2"><i class="bi bi-journal-bookmark-fill"></i></div>
-        <div class="fw-semibold">Ciências</div>
-        <div class="sh-muted" style="font-size:.82rem">Resumo de Biologia</div>
-        <div class="sh-muted mt-2 caderno-atualizado" style="font-size:.75rem">Atualizado em 08/05/2026</div>
-      </a>
-    </div>
-    <div class="col-6 col-md-4 col-lg-3">
-      <a href="#" class="sh-card d-block p-3 text-reset caderno-item" data-id="historia" data-titulo="História" data-desc="Revolução Francesa">
-        <div class="sh-icon-badge mb-2"><i class="bi bi-journal-bookmark-fill"></i></div>
-        <div class="fw-semibold">História</div>
-        <div class="sh-muted" style="font-size:.82rem">Revolução Francesa</div>
-        <div class="sh-muted mt-2 caderno-atualizado" style="font-size:.75rem">Atualizado em 05/05/2026</div>
-      </a>
-    </div>
-  </div>
+  <div class="row g-3 mt-2" id="lista-cadernos"></div>
+  <p id="cadernos-vazio" class="sh-muted text-center py-5 d-none">Você ainda não tem cadernos. Clique em "Novo caderno" para criar o primeiro.</p>
 
   <!-- VISUALIZADOR DO CADERNO ABERTO -->
   <div class="sh-card p-4 mt-4 d-none" id="visualizador-caderno">
@@ -90,7 +57,7 @@
         <h2 class="h5 mb-0" id="cad-titulo">Título</h2>
         <div class="sh-muted" id="cad-desc" style="font-size:.85rem">Descrição</div>
       </div>
-      <button class="btn btn-sh-outline btn-sm" id="btn-fechar-caderno">Fechar</button>
+      <div class="d-flex gap-2"><button class="btn btn-sh-outline btn-sm text-danger" id="btn-excluir-caderno"><i class="bi bi-trash"></i> Excluir</button><button class="btn btn-sh-outline btn-sm" id="btn-fechar-caderno">Fechar</button></div>
     </div>
     <textarea class="form-control sh-search" rows="10" id="cad-texto" placeholder="Escreva suas anotações aqui..."></textarea>
     <div class="d-flex justify-content-between align-items-center mt-2">
@@ -136,92 +103,116 @@
 <script src="app.js"></script>
 <script>shExigirLogin();</script>
 <script>
-  // ==========================================================
-  // Cada caderno guarda suas anotações numa chave PRÓPRIA no
-  // localStorage: "sh_caderno_<id>". É isso que impede que o
-  // conteúdo de um caderno apareça em outro.
-  // Isso é uma simulação local (não é banco de dados de verdade).
-  // No backend em PHP/MySQL, isso vira uma tabela "cadernos" com
-  // uma coluna id_usuario + id_materia, e cada anotação fica numa
-  // linha separada vinculada a esse caderno específico.
-  // ==========================================================
+  shExigirPapel(['Aluno']);
+  // Os cadernos ficam no servidor (api/cadernos.php), ligados à conta de cada aluno:
+  // um aluno nunca enxerga o caderno de outro, e o conteúdo de cada caderno é separado.
 
+  let cadernos = [];
   let cadernoAtualId = null;
+  let alterado = false;
+  let timerAuto = null;
 
-  function chaveCaderno(id) { return 'sh_caderno_' + id; }
+  function desenharCadernos() {
+    const lista = document.getElementById('lista-cadernos');
+    lista.innerHTML = '';
+    document.getElementById('cadernos-vazio').classList.toggle('d-none', cadernos.length > 0);
+    cadernos.forEach((c, i) => {
+      const col = document.createElement('div');
+      col.className = 'col-6 col-md-4 col-lg-3';
+      col.innerHTML = `
+        <a href="#" class="sh-card d-block p-3 text-reset caderno-item" data-id="${c.id}">
+          <div class="sh-icon-badge${i % 2 === 0 ? ' purple' : ''} mb-2"><i class="bi bi-journal-bookmark-fill"></i></div>
+          <div class="fw-semibold">${shEsc(c.titulo)}</div>
+          <div class="sh-muted" style="font-size:.82rem">${shEsc(c.descricao || '')}</div>
+          <div class="sh-muted mt-2 caderno-atualizado" style="font-size:.75rem">Atualizado em ${shEsc(shDataBR(c.atualizadoEm))}</div>
+        </a>`;
+      col.querySelector('a').addEventListener('click', e => { e.preventDefault(); abrirCaderno(c.id); });
+      lista.appendChild(col);
+    });
+  }
 
-  function abrirCaderno(item) {
-    // se um caderno já estava aberto, salva o que tinha nele antes de trocar
-    salvarCadernoAtual(true);
+  async function carregarCadernos() {
+    const r = await shApi('cadernos.php');
+    cadernos = r.cadernos || [];
+    desenharCadernos();
+  }
 
-    cadernoAtualId = item.dataset.id;
-    document.getElementById('cad-titulo').textContent = item.dataset.titulo;
-    document.getElementById('cad-desc').textContent = item.dataset.desc;
+  async function salvarCadernoAtual(silencioso) {
+    clearTimeout(timerAuto);
+    if (!cadernoAtualId || !alterado) return true;
+    const id = cadernoAtualId;
+    const r = await shApi('cadernos.php', { acao: 'salvar', id, corpo: { conteudo: document.getElementById('cad-texto').value } });
+    if (!r.ok) { document.getElementById('cad-status').textContent = r.erro || 'Não foi possível salvar.'; return false; }
+    alterado = false;
+    if (!silencioso && cadernoAtualId === id) document.getElementById('cad-status').textContent = 'Salvo agora ✓';
+    return true;
+  }
 
-    const conteudoSalvo = localStorage.getItem(chaveCaderno(cadernoAtualId)) || '';
-    document.getElementById('cad-texto').value = conteudoSalvo;
+  async function abrirCaderno(id) {
+    await salvarCadernoAtual(true);
+    const r = await shApi('cadernos.php', { acao: 'abrir', id });
+    if (shErroApi(r)) return;
+    cadernoAtualId = id; alterado = false;
+    document.getElementById('cad-titulo').textContent = r.caderno.titulo;
+    document.getElementById('cad-desc').textContent = r.caderno.descricao || '';
+    document.getElementById('cad-texto').value = r.caderno.conteudo || '';
     document.getElementById('cad-status').textContent = '';
-
     const painel = document.getElementById('visualizador-caderno');
     painel.classList.remove('d-none');
     painel.scrollIntoView({ behavior: 'smooth' });
   }
 
-  function salvarCadernoAtual(silencioso) {
-    if (!cadernoAtualId) return;
-    const texto = document.getElementById('cad-texto').value;
-    localStorage.setItem(chaveCaderno(cadernoAtualId), texto);
-    if (!silencioso) {
-      document.getElementById('cad-status').textContent = 'Salvo agora ✓';
-    }
-  }
-
-  function ligarCliqueCaderno(el) {
-    el.addEventListener('click', function (e) {
-      e.preventDefault();
-      abrirCaderno(this);
-    });
-  }
-
-  document.querySelectorAll('.caderno-item').forEach(ligarCliqueCaderno);
-
-  document.getElementById('btn-salvar-caderno').addEventListener('click', function () {
-    salvarCadernoAtual(false);
+  // Salva sozinho 1,5 s depois de parar de digitar
+  document.getElementById('cad-texto').addEventListener('input', function () {
+    alterado = true;
+    document.getElementById('cad-status').textContent = 'Alterações não salvas…';
+    clearTimeout(timerAuto);
+    timerAuto = setTimeout(() => salvarCadernoAtual(false), 1500);
   });
 
-  document.getElementById('btn-fechar-caderno').addEventListener('click', function () {
-    salvarCadernoAtual(true);
+  document.getElementById('btn-salvar-caderno').addEventListener('click', async function () {
+    if (!alterado) { document.getElementById('cad-status').textContent = 'Salvo agora ✓'; return; }
+    await salvarCadernoAtual(false);
+    carregarCadernos();
+  });
+
+  document.getElementById('btn-fechar-caderno').addEventListener('click', async function () {
+    await salvarCadernoAtual(true);
     document.getElementById('visualizador-caderno').classList.add('d-none');
     cadernoAtualId = null;
+    carregarCadernos();
   });
 
-  // Criar novo caderno (o id único vem do título, ex: "Geografia" -> "geografia-1720000000")
-  document.getElementById('btn-criar-caderno').addEventListener('click', function () {
+  document.getElementById('btn-excluir-caderno').addEventListener('click', async function () {
+    if (!cadernoAtualId || !confirm('Excluir este caderno e todas as anotações dele?')) return;
+    if (shErroApi(await shApi('cadernos.php', { acao: 'excluir', id: cadernoAtualId, corpo: {} }))) return;
+    document.getElementById('visualizador-caderno').classList.add('d-none');
+    cadernoAtualId = null; alterado = false;
+    carregarCadernos();
+  });
+
+  document.getElementById('btn-criar-caderno').addEventListener('click', async function () {
     const titulo = document.getElementById('novo-caderno-titulo').value.trim();
-    const desc = document.getElementById('novo-caderno-desc').value.trim() || 'Sem descrição';
+    const descricao = document.getElementById('novo-caderno-desc').value.trim();
     if (!titulo) { alert('Escreva o nome da matéria.'); return; }
-
-    const id = titulo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-') + '-' + Date.now();
-
-    const col = document.createElement('div');
-    col.className = 'col-6 col-md-4 col-lg-3';
-    col.innerHTML = `
-      <a href="#" class="sh-card d-block p-3 text-reset caderno-item" data-id="${id}" data-titulo="${titulo}" data-desc="${desc}">
-        <div class="sh-icon-badge mb-2"><i class="bi bi-journal-bookmark-fill"></i></div>
-        <div class="fw-semibold">${titulo}</div>
-        <div class="sh-muted" style="font-size:.82rem">${desc}</div>
-        <div class="sh-muted mt-2" style="font-size:.75rem">Criado agora</div>
-      </a>`;
-    document.getElementById('lista-cadernos').appendChild(col);
-    ligarCliqueCaderno(col.querySelector('.caderno-item'));
-
+    const r = await shApi('cadernos.php', { acao: 'criar', corpo: { titulo, descricao } });
+    if (shErroApi(r)) return;
     document.getElementById('novo-caderno-titulo').value = '';
     document.getElementById('novo-caderno-desc').value = '';
     bootstrap.Modal.getInstance(document.getElementById('modalNovoCaderno')).hide();
+    await carregarCadernos();
+    abrirCaderno(r.caderno.id);
   });
 
-  // Salva automaticamente se a pessoa sair da página com o caderno aberto
-  window.addEventListener('beforeunload', function () { salvarCadernoAtual(true); });
+  // Se a pessoa sair da página com alterações, tenta salvar (keepalive deixa o envio terminar)
+  window.addEventListener('beforeunload', function () {
+    if (cadernoAtualId && alterado) {
+      fetch('api/cadernos.php?acao=salvar&id=' + cadernoAtualId, { method: 'POST', keepalive: true, credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ conteudo: document.getElementById('cad-texto').value }) });
+    }
+  });
+
+  carregarCadernos();
 </script>
 </body>
 </html>

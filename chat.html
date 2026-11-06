@@ -75,17 +75,17 @@
     <div class="col-md-8 col-lg-9">
       <div class="sh-card d-flex flex-column" style="height: calc(100vh - 130px)">
         <div class="d-flex align-items-center gap-2 p-3 border-bottom">
-          <img id="chat-avatar" src="https://i.pravatar.cc/80?img=12" class="sh-avatar">
+          <img id="chat-avatar" src="https://i.pravatar.cc/80?img=68" class="sh-avatar">
           <div class="flex-grow-1">
-            <div class="fw-semibold" id="chat-nome">Lucas Oliveira</div>
-            <div class="sh-muted" id="chat-status" style="font-size:.78rem"><span class="text-success">●</span> Online agora · Matemática</div>
+            <div class="fw-semibold" id="chat-nome">Conversas</div>
+            <div class="sh-muted" id="chat-status" style="font-size:.78rem"></div>
           </div>
           <i class="bi bi-info-circle sh-muted"></i>
         </div>
 
         <div class="chat-window p-3 flex-grow-1 d-flex flex-column gap-2" id="janela-mensagens"></div>
 
-        <input type="file" id="input-arquivo" class="d-none">
+        <input type="file" id="input-arquivo" class="d-none" accept=".pdf,.png,.jpg,.jpeg,.gif,.txt,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.mp4">
         <form class="d-flex gap-2 p-3 border-top" id="form-mensagem">
           <button type="button" class="btn btn-sh-outline btn-sm" id="btn-anexo"><i class="bi bi-paperclip"></i></button>
           <input class="form-control sh-search" id="input-mensagem" placeholder="Digite sua mensagem...">
@@ -101,175 +101,145 @@
 <script src="app.js"></script>
 <script>
   // ==========================================================
-  // Simulação de múltiplas conversas. Cada contato tem seu próprio
-  // histórico (igual fizemos com os cadernos), pra não misturar
-  // mensagens de tutores diferentes. Isso ainda não é um chat real
-  // (não há outra pessoa do outro lado) — quando o backend existir,
-  // isso vira mensagens de verdade trocadas com o servidor.
+  // Chat de verdade: mensagens ficam no servidor (api/chat.php) e a tela
+  // atualiza sozinha a cada poucos segundos. Só os dois participantes
+  // enxergam a conversa. "Suporte StudyHelp" = conta do administrador.
   // ==========================================================
+  let conversas = [];        // lista vinda do servidor
+  let conversaAtual = null;  // id do contato aberto
+  let mensagens = [];        // mensagens da conversa aberta
+  const AVATAR_PADRAO = 'https://i.pravatar.cc/80?img=68';
 
-  const conversas = {
-    lucas: {
-      nome: 'Lucas Oliveira', materia: 'Matemática', avatar: 'https://i.pravatar.cc/80?img=12', online: true,
-      mensagens: [
-        { de: 'eles', texto: 'Oi Ana! Sobre sua dúvida de Funções do 1º grau, você já tentou identificar o coeficiente angular?' },
-        { de: 'eu', texto: 'Ainda não, não entendi muito bem essa parte 😅' },
-        { de: 'eles', texto: 'Tranquilo! O coeficiente angular é o "a" da função f(x) = ax + b. Ele indica a inclinação da reta.' },
-        { de: 'eles', texto: 'Vou te mandar um exemplo em PDF, ok?' },
-        { de: 'eu', texto: 'Perfeito, obrigada!' },
-        { de: 'eles', arquivo: 'exemplo_funcao_1grau.pdf', tamanho: '240 KB' }
-      ]
-    },
-    juliana: {
-      nome: 'Juliana Santos', materia: 'Português', avatar: 'https://i.pravatar.cc/80?img=32', online: true,
-      mensagens: [
-        { de: 'eles', texto: 'Oi Ana, tudo bem? Vi sua redação sobre dissertação argumentativa.' },
-        { de: 'eles', texto: 'Consegue me enviar a versão mais recente pra eu revisar?' },
-        { de: 'eu', texto: 'Consigo sim! Te mando ainda hoje.' }
-      ]
-    },
-    rafael: {
-      nome: 'Rafael Costa', materia: 'Matemática', avatar: 'https://i.pravatar.cc/80?img=51', online: false,
-      mensagens: [
-        { de: 'eu', texto: 'Muito obrigada pela aula de hoje, Rafael!' },
-        { de: 'eles', texto: 'Obrigado pela aula de hoje! Fico feliz que tenha ajudado 🙂' }
-      ]
-    },
-    carla: {
-      nome: 'Carla Menezes', materia: 'Ciências', avatar: 'https://i.pravatar.cc/80?img=47', online: true,
-      mensagens: [
-        { de: 'eles', texto: 'Oi Ana! Vi que você acessou o material sobre Leis de Newton.' },
-        { de: 'eles', texto: 'Ficou alguma dúvida sobre as três leis?' },
-        { de: 'eu', texto: 'Fiquei com uma dúvida sobre a terceira lei, sobre ação e reação.' }
-      ]
-    },
-    suporte: {
-      nome: 'Suporte StudyHelp', materia: null, avatar: null, online: true,
-      mensagens: [
-        { de: 'eles', texto: 'Olá! Somos o suporte do StudyHelp. Como podemos ajudar?' }
-      ]
-    }
-  };
+  function tamanhoLegivel(b) { return b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
 
-  let conversaAtual = 'lucas';
-
-  function renderizarListaConversas(filtro) {
+  function renderizarListaConversas() {
     const lista = document.getElementById('lista-conversas');
+    const termo = document.getElementById('busca-conversa').value.toLowerCase();
     lista.innerHTML = '';
-    const termo = (filtro || '').toLowerCase();
-
-    Object.keys(conversas).forEach(id => {
-      const c = conversas[id];
-      if (termo && !c.nome.toLowerCase().includes(termo)) return;
-
-      const ultima = c.mensagens[c.mensagens.length - 1];
-      const previa = ultima.texto ? ultima.texto : ('📎 ' + ultima.arquivo);
-
+    const visiveis = conversas.filter(c => !termo || c.nome.toLowerCase().includes(termo));
+    if (visiveis.length === 0) lista.innerHTML = '<p class="sh-muted text-center mb-0 py-3" style="font-size:.82rem">Nenhuma conversa ainda.</p>';
+    visiveis.forEach(c => {
+      const previa = !c.ultima ? 'Comece a conversa' : (c.ultima.texto ? c.ultima.texto : '📎 ' + c.ultima.arquivo.nome);
       const div = document.createElement('div');
-      div.className = 'd-flex align-items-center gap-2 p-2 mt-1 rounded-3 conversa-item' + (id === conversaAtual ? ' ativa' : '');
-      div.dataset.id = id;
-      div.innerHTML = c.avatar
-        ? `<img src="${c.avatar}" class="sh-avatar">`
-        : `<div class="sh-icon-badge purple"><i class="bi bi-headset"></i></div>`;
-      div.innerHTML += `
+      div.className = 'd-flex align-items-center gap-2 p-2 mt-1 rounded-3 conversa-item' + (c.id === conversaAtual ? ' ativa' : '');
+      div.style.cursor = 'pointer';
+      div.innerHTML = (c.suporte
+        ? '<div class="sh-icon-badge purple"><i class="bi bi-headset"></i></div>'
+        : '<img src="' + shEsc(c.avatar || 'https://i.pravatar.cc/80?u=' + c.id) + '" class="sh-avatar">') + `
         <div class="flex-grow-1" style="min-width:0">
-          <div class="fw-semibold" style="font-size:.9rem">${c.nome}</div>
-          <div class="sh-muted text-truncate" style="font-size:.78rem;max-width:150px">${previa}</div>
-        </div>`;
-      div.addEventListener('click', function () { abrirConversa(id); });
+          <div class="fw-semibold" style="font-size:.9rem">${shEsc(c.nome)}</div>
+          <div class="sh-muted text-truncate" style="font-size:.78rem;max-width:150px">${shEsc(previa)}</div>
+        </div>` + (c.naoLidas ? '<span class="badge rounded-pill" style="background:var(--sh-green-dark)">' + c.naoLidas + '</span>' : '');
+      div.addEventListener('click', () => abrirConversa(c.id));
       lista.appendChild(div);
     });
   }
 
   function renderizarMensagens() {
-    const c = conversas[conversaAtual];
     const janela = document.getElementById('janela-mensagens');
+    const noFim = janela.scrollHeight - janela.scrollTop - janela.clientHeight < 80;
     janela.innerHTML = '';
-
-    c.mensagens.forEach(m => {
+    if (mensagens.length === 0) janela.innerHTML = '<p class="sh-muted text-center my-auto" style="font-size:.85rem">Nenhuma mensagem ainda. Diga oi! 👋</p>';
+    mensagens.forEach(m => {
       if (m.arquivo) {
-        const div = document.createElement('div');
-        div.className = (m.de === 'eu' ? 'align-self-end' : 'align-self-start') + ' d-flex align-items-center gap-2 sh-card p-2';
-        div.style.maxWidth = '70%';
-        div.innerHTML = `
-          <i class="bi bi-file-earmark-pdf-fill text-danger fs-4"></i>
-          <div>
-            <div class="fw-semibold" style="font-size:.85rem">${m.arquivo}</div>
-            <div class="sh-muted" style="font-size:.75rem">${m.tamanho}</div>
-          </div>`;
-        janela.appendChild(div);
-      } else {
+        const a = document.createElement('a');
+        a.href = m.arquivo.url; a.target = '_blank'; a.rel = 'noopener';
+        a.className = (m.de === 'eu' ? 'align-self-end' : 'align-self-start') + ' d-flex align-items-center gap-2 sh-card p-2 text-reset text-decoration-none';
+        a.style.maxWidth = '70%';
+        a.innerHTML = `<i class="bi bi-file-earmark-arrow-down-fill fs-4" style="color:var(--sh-green-dark)"></i>
+          <div><div class="fw-semibold" style="font-size:.85rem">${shEsc(m.arquivo.nome)}</div>
+          <div class="sh-muted" style="font-size:.75rem">${tamanhoLegivel(m.arquivo.tamanho)}</div></div>`;
+        janela.appendChild(a);
+      }
+      if (m.texto) {
         const div = document.createElement('div');
         div.className = m.de === 'eu' ? 'align-self-end sh-chat-bubble-me' : 'align-self-start sh-chat-bubble-other';
+        div.title = shHora(m.criadoEm);
         div.textContent = m.texto;
         janela.appendChild(div);
       }
     });
-
-    janela.scrollTop = janela.scrollHeight;
+    if (noFim) janela.scrollTop = janela.scrollHeight;
   }
 
-  function abrirConversa(id) {
+  async function carregarConversas(com) {
+    const r = await shApi('chat.php', { acao: 'conversas', params: com ? { com } : {} });
+    if (r.ok) { conversas = r.conversas; renderizarListaConversas(); }
+    return r.ok;
+  }
+
+  async function abrirConversa(id) {
     conversaAtual = id;
-    const c = conversas[id];
+    const c = conversas.find(x => x.id === id);
+    if (!c) return;
     document.getElementById('chat-nome').textContent = c.nome;
-    document.getElementById('chat-status').innerHTML = c.materia
-      ? `<span class="text-success">●</span> ${c.online ? 'Online agora' : 'Offline'} · ${c.materia}`
-      : `<span class="text-success">●</span> Sempre disponível`;
-    const avatarImg = document.getElementById('chat-avatar');
-    avatarImg.src = c.avatar || 'https://i.pravatar.cc/80?img=68';
-
-    renderizarMensagens();
-    renderizarListaConversas(document.getElementById('busca-conversa').value);
+    document.getElementById('chat-status').innerHTML = c.suporte
+      ? '<span class="text-success">●</span> Sempre disponível'
+      : `<span class="${c.online ? 'text-success' : 'text-secondary'}">●</span> ${c.online ? 'Online agora' : 'Offline'}${c.materia ? ' · ' + shEsc(c.materia) : ''}`;
+    document.getElementById('chat-avatar').src = c.avatar || (c.suporte ? AVATAR_PADRAO : 'https://i.pravatar.cc/80?u=' + c.id);
+    mensagens = [];
+    document.getElementById('janela-mensagens').scrollTop = 0;
+    const r = await shApi('chat.php', { acao: 'mensagens', params: { com: id } });
+    if (conversaAtual !== id) return;
+    mensagens = r.mensagens || [];
+    c.naoLidas = 0;
+    renderizarMensagens(); renderizarListaConversas();
+    const j = document.getElementById('janela-mensagens'); j.scrollTop = j.scrollHeight;
   }
 
-  // Envio de mensagem
-  document.getElementById('form-mensagem').addEventListener('submit', function (e) {
+  // Atualização automática (só enquanto a aba está aberta)
+  async function atualizar() {
+    if (document.hidden) return;
+    await carregarConversas();
+    if (!conversaAtual) return;
+    const ultimo = mensagens.length ? mensagens[mensagens.length - 1].id : 0;
+    const r = await shApi('chat.php', { acao: 'mensagens', params: { com: conversaAtual, depois: ultimo } });
+    if (r.ok && r.mensagens.length) { mensagens = mensagens.concat(r.mensagens); renderizarMensagens(); }
+  }
+
+  async function enviar(texto, arquivo) {
+    if (!conversaAtual) return;
+    const fd = new FormData();
+    fd.append('para', conversaAtual);
+    if (texto) fd.append('texto', texto);
+    if (arquivo) fd.append('arquivo', arquivo);
+    const r = await shApi('chat.php', { acao: 'enviar', form: fd });
+    if (shErroApi(r)) return false;
+    mensagens.push(r.mensagem);
+    renderizarMensagens();
+    const j = document.getElementById('janela-mensagens'); j.scrollTop = j.scrollHeight;
+    carregarConversas();
+    return true;
+  }
+
+  document.getElementById('form-mensagem').addEventListener('submit', async function (e) {
     e.preventDefault();
     const input = document.getElementById('input-mensagem');
     const texto = input.value.trim();
     if (!texto) return;
-
-    conversas[conversaAtual].mensagens.push({ de: 'eu', texto: texto });
     input.value = '';
-    renderizarMensagens();
-    renderizarListaConversas(document.getElementById('busca-conversa').value);
-
-    // resposta automática simulada, só pra dar vida à demonstração
-    if (conversaAtual !== 'suporte') {
-      setTimeout(() => {
-        conversas[conversaAtual].mensagens.push({ de: 'eles', texto: 'Recebido! (resposta simulada — sem backend ainda)' });
-        renderizarMensagens();
-        renderizarListaConversas(document.getElementById('busca-conversa').value);
-      }, 900);
-    }
+    if (!(await enviar(texto, null))) input.value = texto;
   });
 
-  // Anexo de arquivo
-  document.getElementById('btn-anexo').addEventListener('click', function () {
-    document.getElementById('input-arquivo').click();
-  });
-  document.getElementById('input-arquivo').addEventListener('change', function () {
+  document.getElementById('btn-anexo').addEventListener('click', () => document.getElementById('input-arquivo').click());
+  document.getElementById('input-arquivo').addEventListener('change', async function () {
     const arquivo = this.files[0];
-    if (!arquivo) return;
-    const tamanhoKB = Math.max(1, Math.round(arquivo.size / 1024));
-    conversas[conversaAtual].mensagens.push({ de: 'eu', arquivo: arquivo.name, tamanho: tamanhoKB + ' KB' });
-    renderizarMensagens();
-    renderizarListaConversas(document.getElementById('busca-conversa').value);
     this.value = '';
+    if (arquivo) await enviar('', arquivo);
   });
+  document.getElementById('busca-conversa').addEventListener('input', renderizarListaConversas);
 
-  document.getElementById('busca-conversa').addEventListener('input', function () {
-    renderizarListaConversas(this.value);
-  });
-
-  // Inicialização
-  renderizarListaConversas();
-  // Abre a conversa certa dependendo de qual "Conversar"/"Ver perfil" foi clicado
-  // (ex: chat.html?tutor=juliana). Se não vier nada na URL, abre a primeira da lista.
-  const parametros = new URLSearchParams(window.location.search);
-  const tutorPedido = parametros.get('tutor');
-  abrirConversa(conversas[tutorPedido] ? tutorPedido : 'lucas');
+  async function iniciar() {
+    if (!shEstaLogado()) return; // visitante vê só a tela de bloqueio
+    const p = new URLSearchParams(window.location.search);
+    const pedido = parseInt(p.get('tutor') || p.get('com') || '', 10) || 0;
+    if (!(await carregarConversas(pedido || undefined))) return;
+    const alvo = conversas.find(c => c.id === pedido) || conversas[0];
+    if (alvo) abrirConversa(alvo.id);
+    else document.getElementById('chat-nome').textContent = 'Nenhuma conversa';
+    setInterval(atualizar, 4000);
+  }
+  iniciar();
 </script>
 </body>
 </html>

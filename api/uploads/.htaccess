@@ -1,0 +1,2 @@
+# Arquivos só saem por materiais.php / chat.php (que checam login e permissão)
+Require all denied

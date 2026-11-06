@@ -109,7 +109,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="app.js"></script>
-<script src="api.js"></script>
+
 <script>
   // Login e cadastro agora são feitos no servidor (api/auth.php).
 
@@ -162,7 +162,7 @@
       avatar: fotoCadastroBase64
     }});
     if (!r.ok) { erroEl.textContent = r.erro || 'Erro ao cadastrar.'; erroEl.classList.remove('d-none'); return; }
-    shEspelharSessao(r.usuario);
+    shGuardarUsuario(r.usuario);
     window.location.href = shDestinoPainel(r.usuario);
   });
 
@@ -179,7 +179,7 @@
       return;
     }
     erro.classList.add('d-none');
-    shEspelharSessao(r.usuario);
+    shGuardarUsuario(r.usuario);
     window.location.href = shDestinoPainel(r.usuario);
   });
 

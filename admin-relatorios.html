@@ -60,11 +60,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="app.js"></script>
 
-<script>
-  // Bloqueia quem digitar essa URL direto sem ter passado pela senha administrativa
-  const u = shGetUser();
-  if (u.papel !== 'Administrador') window.location.href = 'admin-login.html';
-</script>
+<script>shExigirPapel(['Administrador'], 'admin-login.html');</script>
 
 <script>
   function renderKPIsRelatorio() {
@@ -88,14 +84,13 @@
       div.className = 'd-flex justify-content-between py-2 border-bottom';
       div.style.fontSize = '.85rem';
       div.style.cursor = 'pointer';
-      div.innerHTML = `<span>${a.texto}</span><span class="sh-muted">${a.tempo}</span>`;
+      div.innerHTML = `<span>${shEsc(a.texto)}</span><span class="sh-muted">${shEsc(a.tempo)}</span>`;
       div.addEventListener('click', () => alert(a.texto + '\n\n' + a.tempo));
       cont.appendChild(div);
     });
   }
 
-  renderKPIsRelatorio();
-  renderAtividades();
+  shCarregarAdmin().then(ok => { if (ok) { renderKPIsRelatorio(); renderAtividades(); } });
 </script>
 </body>
 </html>

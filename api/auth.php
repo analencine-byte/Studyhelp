@@ -14,16 +14,16 @@ case 'cadastro':
     if (strlen($senha) < 6) erro('A senha precisa ter no mínimo 6 caracteres.');
     if (!in_array($papel, ['Aluno', 'Tutor'], true)) erro('Papel inválido.'); // admin nunca se cadastra pelo site
     $avatar = $d['avatar'] ?? null;
-    if ($avatar !== null && (!is_string($avatar) || strlen($avatar) > 2_000_000)) erro('Foto inválida ou grande demais.');
+    if ($avatar !== null && !avatarValido($avatar)) erro('Foto inválida ou grande demais.');
     $st = db()->prepare('SELECT 1 FROM usuarios WHERE email = ?'); $st->execute([$email]);
     if ($st->fetch()) erro('Já existe uma conta com esse email.', 409);
-    $status = $papel === 'Tutor' ? 'Pendente' : 'Aprovado';
+    $status = ($papel === 'Tutor' && configuracao('aprovar_tutores_manualmente', '1') === '1') ? 'Pendente' : 'Aprovado';
     db()->prepare('INSERT INTO usuarios (nome,email,senha_hash,papel,status,avatar) VALUES (?,?,?,?,?,?)')
         ->execute([$nome, $email, password_hash($senha, PASSWORD_DEFAULT), $papel, $status, $avatar]);
     $id = (int)db()->lastInsertId();
     session_regenerate_id(true);
     $_SESSION['uid'] = $id;
-    registrarAtividade($papel === 'Tutor' ? "$nome solicitou cadastro como tutor(a)" : "$nome se cadastrou como aluno(a)");
+    registrarAtividade($papel === 'Tutor' ? ($status === 'Pendente' ? "$nome solicitou cadastro como tutor(a)" : "$nome se cadastrou como tutor(a)") : "$nome se cadastrou como aluno(a)");
     responder(['usuario' => usuarioPublico(usuarioAtual())], 201);
 
 case 'login':

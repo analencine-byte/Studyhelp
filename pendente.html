@@ -33,8 +33,10 @@
 
     <hr>
 
-    <p class="sh-muted mb-2" style="font-size:.8rem">Este protótipo não tem backend ainda, então simule a aprovação abaixo pra ver como fica o painel do professor liberado:</p>
-    <button class="btn btn-sh-primary btn-sm" id="btn-simular-aprovacao">Simular aprovação do administrador</button>
+    <p class="sh-muted mb-2" style="font-size:.8rem">Já foi aprovado(a)? Confira o status do seu cadastro:</p>
+    <button class="btn btn-sh-primary btn-sm" id="btn-verificar-aprovacao">Verificar agora</button>
+    <p id="msg-ainda-pendente" class="sh-muted mt-3 mb-0 d-none" style="font-size:.82rem">Seu cadastro ainda está em análise. Volte em breve!</p>
+    <p id="msg-recusado" class="text-danger mt-3 mb-0 d-none" style="font-size:.85rem">Seu cadastro de tutor não foi aprovado. Em caso de dúvida, fale com o suporte.</p>
   </div>
 </div>
 
@@ -42,20 +44,31 @@
 <script src="app.js"></script>
 <script>shExigirLogin();</script>
 <script>
-  // Se por algum motivo o usuário já foi aprovado (ou não é tutor), manda direto pro painel certo
-  const u = shGetUser();
-  if (u.papel === 'Administrador') window.location.href = 'admin.html';
-  else if (u.papel === 'Aluno') window.location.href = 'aluno.html';
-  else if (u.papel === 'Tutor' && u.status === 'Aprovado') window.location.href = 'professor.html';
+  // Confere no servidor: se já foi aprovado(a) (ou não é tutor), vai direto pro painel certo.
+  function irParaPainelSeAprovado(u) {
+    if (!u) return;
+    const destino = shDestinoPainel(u);
+    if (destino !== 'pendente.html') window.location.replace(destino);
+  }
+  shPronto.then(irParaPainelSeAprovado);
+  shPronto.then(u => { if (u && u.status === 'Recusado') { document.getElementById('msg-recusado').classList.remove('d-none'); document.getElementById('btn-verificar-aprovacao').classList.add('d-none'); } });
 
-  document.getElementById('btn-simular-aprovacao').addEventListener('click', function () {
-    const user = shGetUser();
-    user.status = 'Aprovado';
-    shSaveUser(user);
-    shRegistrarUsuarioNaBase(user.nome, user.email, 'Tutor', 'Aprovado');
-    shAdicionarAtividade(`${user.nome} foi aprovado(a) como tutor(a)`);
-    window.location.href = 'professor.html';
+  // Botão "Verificar agora": pergunta de novo ao servidor se o admin já aprovou
+  const btn = document.getElementById('btn-verificar-aprovacao');
+  btn.addEventListener('click', async function () {
+    btn.disabled = true;
+    const r = await shApi('auth.php', { acao: 'eu' });
+    btn.disabled = false;
+    if (r.ok && r.usuario) {
+      shGuardarUsuario(r.usuario);
+      if (shDestinoPainel(r.usuario) !== 'pendente.html') { window.location.replace(shDestinoPainel(r.usuario)); return; }
+    }
+    document.getElementById('msg-ainda-pendente').classList.remove('d-none');
   });
+  setInterval(async () => {
+    const r = await shApi('auth.php', { acao: 'eu' });
+    if (r.ok && r.usuario && shDestinoPainel(r.usuario) !== 'pendente.html') { shGuardarUsuario(r.usuario); window.location.replace(shDestinoPainel(r.usuario)); }
+  }, 30000);
 </script>
 </body>
 </html>

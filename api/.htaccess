@@ -1,4 +1,4 @@
-# Impede acesso direto a arquivos internos
-<FilesMatch "^(config|bootstrap|install)\.php$|\.sql$|\.sqlite$">
+# Impede acesso direto a arquivos internos (install.php se protege sozinho com a chave)
+<FilesMatch "^(config|config\.local|bootstrap)\.php$|\.sql$|\.sqlite$">
   Require all denied
 </FilesMatch>

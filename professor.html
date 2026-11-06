@@ -66,16 +66,16 @@
 
     <div class="row g-3 mb-4" data-secao="dashboard">
       <div class="col-6 col-md-3">
-        <div class="sh-card p-3"><div class="sh-muted" style="font-size:.8rem">Matérias publicadas</div><div class="h4 mb-0" id="kpi-materias-professor">5</div></div>
+        <div class="sh-card p-3"><div class="sh-muted" style="font-size:.8rem">Matérias publicadas</div><div class="h4 mb-0" id="kpi-materias-professor">–</div></div>
       </div>
       <div class="col-6 col-md-3">
-        <div class="sh-card p-3"><div class="sh-muted" style="font-size:.8rem">Alunos alcançados</div><div class="h4 mb-0">128</div></div>
+        <div class="sh-card p-3"><div class="sh-muted" style="font-size:.8rem">Alunos alcançados</div><div class="h4 mb-0" id="kpi-alunos-professor">–</div></div>
       </div>
       <div class="col-6 col-md-3">
-        <div class="sh-card p-3"><div class="sh-muted" style="font-size:.8rem">Materiais publicados</div><div class="h4 mb-0">18</div></div>
+        <div class="sh-card p-3"><div class="sh-muted" style="font-size:.8rem">Materiais publicados</div><div class="h4 mb-0" id="kpi-materiais-professor">–</div></div>
       </div>
       <div class="col-6 col-md-3">
-        <div class="sh-card p-3"><div class="sh-muted" style="font-size:.8rem">Interações no fórum</div><div class="h4 mb-0">47</div></div>
+        <div class="sh-card p-3"><div class="sh-muted" style="font-size:.8rem">Mensagens recebidas</div><div class="h4 mb-0" id="kpi-mensagens-professor">–</div></div>
       </div>
     </div>
 
@@ -98,18 +98,7 @@
             <h2 class="h6 mb-0">Conteúdos recentes</h2>
             <a href="materiais.html" class="sh-nav-link">Ver todos</a>
           </div>
-          <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-            <div class="d-flex align-items-center gap-2"><span class="sh-pill purple">Vídeo</span><span style="font-size:.9rem">Funções do 1º grau</span></div>
-            <span class="sh-muted" style="font-size:.8rem">22/05/2026</span>
-          </div>
-          <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-            <div class="d-flex align-items-center gap-2"><span class="sh-pill gray">PDF</span><span style="font-size:.9rem">Leis de Newton</span></div>
-            <span class="sh-muted" style="font-size:.8rem">20/05/2026</span>
-          </div>
-          <div class="d-flex justify-content-between align-items-center py-2">
-            <div class="d-flex align-items-center gap-2"><span class="sh-pill gray">PDF</span><span style="font-size:.9rem">Reações químicas</span></div>
-            <span class="sh-muted" style="font-size:.8rem">19/05/2026</span>
-          </div>
+          <div id="lista-conteudos-recentes"></div>
         </div>
       </div>
 
@@ -120,7 +109,7 @@
           <form id="form-publicar">
             <div class="mb-2">
               <label class="form-label fw-semibold" style="font-size:.85rem">Matéria</label>
-              <select class="form-select sh-search" id="select-materia-publicar"></select>
+              <select class="form-select sh-search" id="select-materia-publicar" required></select>
             </div>
             <div class="mb-2">
               <label class="form-label fw-semibold" style="font-size:.85rem">Tipo de conteúdo</label>
@@ -133,17 +122,19 @@
             </div>
             <div class="mb-2">
               <label class="form-label fw-semibold" style="font-size:.85rem">Título</label>
-              <input class="form-control sh-search" placeholder="Ex: Funções do 1º grau">
+              <input class="form-control sh-search" id="publicar-titulo" placeholder="Ex: Funções do 1º grau" required maxlength="160">
             </div>
             <div class="mb-2">
               <label class="form-label fw-semibold" style="font-size:.85rem">Descrição</label>
-              <textarea class="form-control sh-search" rows="2" placeholder="Descreva o conteúdo..."></textarea>
+              <textarea class="form-control sh-search" id="publicar-descricao" rows="2" placeholder="Descreva o conteúdo..."></textarea>
             </div>
             <div class="mb-3">
               <label class="form-label fw-semibold" style="font-size:.85rem">Arquivo</label>
-              <input type="file" class="form-control sh-search">
+              <input type="file" class="form-control sh-search" id="publicar-arquivo">
+              <div class="sh-muted mt-1" style="font-size:.75rem">PDF, vídeo (mp4), imagem, Word, PowerPoint ou Excel — até 50 MB (limite do servidor pode ser menor).</div>
             </div>
-            <button class="btn btn-sh-primary btn-sm w-100" type="submit">Publicar</button>
+            <div id="publicar-erro" class="text-danger d-none mb-2" style="font-size:.82rem"></div>
+            <button class="btn btn-sh-primary btn-sm w-100" type="submit" id="btn-publicar">Publicar</button>
           </form>
         </div>
 
@@ -201,14 +192,18 @@
 <script src="app.js"></script>
 <script>
   shExigirLogin();
-  const u = shGetUser();
-  if (u.papel !== 'Tutor') {
-    // Não é tutor (ex: aluno tentando acessar direto pela URL) — manda pro painel certo
-    window.location.href = u.papel === 'Administrador' ? 'admin.html' : 'aluno.html';
-  } else if (u.status !== 'Aprovado') {
-    // Tutor ainda não aprovado pelo administrador
-    window.location.href = 'pendente.html';
-  }
+  // Só tutor aprovado entra aqui; aluno/admin vão pro painel certo e tutor pendente vai pra tela de espera.
+  (function () {
+    const u = shGetUser();
+    if (u.papel !== 'Tutor') window.location.replace(shDestinoPainel(u));
+    else if (u.status !== 'Aprovado' && u.status !== 'Ativo') window.location.replace('pendente.html');
+    shPronto.then(srv => {
+      if (!srv || srv.papel !== 'Tutor') window.location.replace(srv ? shDestinoPainel(srv) : 'login.html');
+      else if (srv.status !== 'Aprovado' && srv.status !== 'Ativo') window.location.replace('pendente.html');
+    });
+  })();
+
+  let minhasMaterias = [];
 
   // Botões de "Tipo de conteúdo" — só um fica selecionado (verde) por vez
   document.querySelectorAll('#grupo-tipo-conteudo .sh-type-btn').forEach(btn => {
@@ -219,133 +214,145 @@
     });
   });
 
-  // Publicar material — mostra a confirmação e já limpa o formulário pro próximo envio
-  document.getElementById('form-publicar').addEventListener('submit', function (e) {
+  // Publicar material (envia o arquivo de verdade pro servidor)
+  document.getElementById('form-publicar').addEventListener('submit', async function (e) {
     e.preventDefault();
-    const tipo = document.getElementById('tipo-conteudo-selecionado').value;
-    alert(`Material do tipo "${tipo}" publicado (simulação) — conectar ao backend para salvar de verdade.`);
+    const erro = document.getElementById('publicar-erro');
+    erro.classList.add('d-none');
+    const materiaId = document.getElementById('select-materia-publicar').value;
+    if (!materiaId) { erro.textContent = 'Crie uma matéria antes de publicar.'; erro.classList.remove('d-none'); return; }
+    const fd = new FormData();
+    fd.append('materiaId', materiaId);
+    fd.append('tipo', document.getElementById('tipo-conteudo-selecionado').value);
+    fd.append('titulo', document.getElementById('publicar-titulo').value.trim());
+    fd.append('descricao', document.getElementById('publicar-descricao').value.trim());
+    const arq = document.getElementById('publicar-arquivo').files[0];
+    if (arq) fd.append('arquivo', arq);
+    const btn = document.getElementById('btn-publicar');
+    btn.disabled = true; btn.textContent = 'Enviando...';
+    const r = await shApi('materiais.php', { acao: 'criar', form: fd });
+    btn.disabled = false; btn.textContent = 'Publicar';
+    if (!r.ok) { erro.textContent = r.erro || 'Não foi possível publicar.'; erro.classList.remove('d-none'); return; }
 
-    this.reset(); // limpa título, descrição, matéria e o arquivo escolhido
-
-    // Volta a seleção de tipo pro padrão (Vídeo), já que reset() não mexe nos botões
+    this.reset();
     document.querySelectorAll('#grupo-tipo-conteudo .sh-type-btn').forEach(b => b.classList.remove('selected'));
     document.querySelector('#grupo-tipo-conteudo .sh-type-btn[data-tipo="Vídeo"]').classList.add('selected');
     document.getElementById('tipo-conteudo-selecionado').value = 'Vídeo';
+    alert('Material publicado!');
+    carregarTudo();
   });
-  // ==========================================================
-  // Matérias do professor — guardadas no navegador (sem backend
-  // ainda). Cada linha nova entra numa lista própria em localStorage
-  // pra sobreviver a um F5 na página.
-  // ==========================================================
-  function shGetMateriasProfessor() {
-    try {
-      const raw = localStorage.getItem('sh_professor_materias');
-      if (raw) return JSON.parse(raw);
-    } catch (e) {}
-    return [
-      { nome: 'Matemática', icone: 'bi-calculator', cor: 'var(--sh-green-dark)', conteudos: 12, alunos: 45 },
-      { nome: 'Física', icone: 'bi-lightning-charge', cor: 'var(--sh-purple)', conteudos: 8, alunos: 32 },
-      { nome: 'Química', icone: 'bi-droplet', cor: 'var(--sh-green-dark)', conteudos: 6, alunos: 28 }
-    ];
-  }
-  function shSalvarMateriasProfessor(lista) {
-    try { localStorage.setItem('sh_professor_materias', JSON.stringify(lista)); } catch (e) {}
-  }
 
+  // ==========================================================
+  // Matérias, números e conteúdos do professor — vêm do servidor
+  // ==========================================================
   function renderMateriasProfessor() {
-    const lista = shGetMateriasProfessor();
+    const lista = minhasMaterias;
     document.getElementById('kpi-materias-professor').textContent = lista.length;
 
     const select = document.getElementById('select-materia-publicar');
     const valorAnterior = select.value;
-    select.innerHTML = lista.map(m => `<option>${m.nome}</option>`).join('');
-    if (lista.some(m => m.nome === valorAnterior)) select.value = valorAnterior;
+    select.innerHTML = lista.map(m => `<option value="${m.id}">${shEsc(m.nome)}</option>`).join('');
+    if (lista.some(m => String(m.id) === valorAnterior)) select.value = valorAnterior;
 
     const corpo = document.getElementById('tabela-materias-professor');
     corpo.innerHTML = '';
-    lista.forEach((m, i) => {
+    if (lista.length === 0) corpo.innerHTML = '<tr><td colspan="4" class="sh-muted text-center py-3">Você ainda não tem matérias. Clique em "Nova matéria".</td></tr>';
+    lista.forEach(m => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td><i class="bi ${m.icone} me-1" style="color:${m.cor}"></i> ${m.nome}</td>
+        <td><i class="bi bi-journal-bookmark me-1" style="color:var(--sh-green-dark)"></i> ${shEsc(m.nome)}</td>
         <td>${m.conteudos} conteúdos</td>
         <td>${m.alunos} alunos</td>
-        <td class="text-end"><i class="bi bi-pencil sh-muted me-2" style="cursor:pointer" data-editar-materia="${i}" title="Editar matéria"></i><i class="bi bi-trash text-danger" style="cursor:pointer" data-del-materia="${i}" title="Excluir matéria"></i></td>`;
+        <td class="text-end"><i class="bi bi-pencil sh-muted me-2" style="cursor:pointer" data-editar-materia="${m.id}" title="Editar matéria"></i><i class="bi bi-trash text-danger" style="cursor:pointer" data-del-materia="${m.id}" title="Excluir matéria"></i></td>`;
       corpo.appendChild(tr);
     });
 
-    // Editar (lápis): abre o mesmo tipo de modal da criação, já preenchido
+    // Editar (lápis): abre o modal já preenchido
     document.querySelectorAll('[data-editar-materia]').forEach(icon => {
       icon.addEventListener('click', function () {
-        const idx = parseInt(this.dataset.editarMateria, 10);
-        const materia = shGetMateriasProfessor()[idx];
+        const materia = minhasMaterias.find(m => String(m.id) === this.dataset.editarMateria);
+        if (!materia) return;
         document.getElementById('editar-materia-nome').value = materia.nome;
-        document.getElementById('editar-materia-indice').value = idx;
+        document.getElementById('editar-materia-indice').value = materia.id;
         new bootstrap.Modal(document.getElementById('modalEditarMateria')).show();
       });
     });
 
     // Excluir (lixeira)
     document.querySelectorAll('[data-del-materia]').forEach(icon => {
-      icon.addEventListener('click', function () {
-        if (!confirm('Remover essa matéria?')) return;
-        const idx = parseInt(this.dataset.delMateria, 10);
-        const lista2 = shGetMateriasProfessor();
-        lista2.splice(idx, 1);
-        shSalvarMateriasProfessor(lista2);
-        renderMateriasProfessor();
+      icon.addEventListener('click', async function () {
+        if (!confirm('Remover essa matéria? Os materiais dela também serão removidos.')) return;
+        if (shErroApi(await shApi('materias.php', { acao: 'excluir', id: this.dataset.delMateria, corpo: {} }))) return;
+        carregarTudo();
       });
     });
   }
 
-  document.getElementById('btn-salvar-edicao-materia').addEventListener('click', function () {
-    const idx = parseInt(document.getElementById('editar-materia-indice').value, 10);
+  document.getElementById('btn-salvar-edicao-materia').addEventListener('click', async function () {
+    const id = document.getElementById('editar-materia-indice').value;
     const nome = document.getElementById('editar-materia-nome').value.trim();
     if (!nome) { alert('Escreva o nome da matéria.'); return; }
-    const lista = shGetMateriasProfessor();
-    lista[idx].nome = nome;
-    shSalvarMateriasProfessor(lista);
+    if (shErroApi(await shApi('materias.php', { acao: 'editar', id, corpo: { nome } }))) return;
     bootstrap.Modal.getInstance(document.getElementById('modalEditarMateria')).hide();
-    renderMateriasProfessor();
+    carregarTudo();
   });
 
-  document.getElementById('btn-criar-materia-professor').addEventListener('click', function () {
+  document.getElementById('btn-criar-materia-professor').addEventListener('click', async function () {
     const nome = document.getElementById('nova-materia-professor-nome').value.trim();
     if (!nome) { alert('Escreva o nome da matéria.'); return; }
-    const lista = shGetMateriasProfessor();
-    lista.push({ nome, icone: 'bi-journal-bookmark', cor: 'var(--sh-green-dark)', conteudos: 0, alunos: 0 });
-    shSalvarMateriasProfessor(lista);
+    if (shErroApi(await shApi('materias.php', { acao: 'criar', corpo: { nome } }))) return;
     document.getElementById('nova-materia-professor-nome').value = '';
     bootstrap.Modal.getInstance(document.getElementById('modalMateria')).hide();
-    renderMateriasProfessor();
+    carregarTudo();
   });
 
-  renderMateriasProfessor();
-
-  // ==========================================================
-  // Alunos matriculados nas matérias do professor — mostra nome
-  // e em qual matéria cada um está inscrito (o que o botão "Alunos"
-  // deve exibir). Simulação local; no backend viria de uma consulta
-  // juntando alunos + inscrições.
-  // ==========================================================
-  const shAlunosProfessor = [
-    { nome: 'Ana Fernanda', materia: 'Matemática', foto: 47 },
-    { nome: 'Pedro Henrique', materia: 'Física', foto: 15 },
-    { nome: 'Mariana Souza', materia: 'Matemática', foto: 23 },
-    { nome: 'Bruno Castro', materia: 'Química', foto: 8 },
-    { nome: 'Camila Duarte', materia: 'Física', foto: 44 },
-    { nome: 'Eduardo Nunes', materia: 'Matemática', foto: 6 },
-    { nome: 'Larissa Prado', materia: 'Química', foto: 36 }
-  ];
-
-  function renderAlunosProfessor() {
+  function renderAlunosProfessor(alunos) {
     const lista = document.getElementById('lista-alunos-professor');
-    lista.innerHTML = shAlunosProfessor.map((a, i) => `
-      <div class="d-flex align-items-center gap-2 py-2${i < shAlunosProfessor.length - 1 ? ' border-bottom' : ''}">
-        <img src="https://i.pravatar.cc/80?img=${a.foto}" class="sh-avatar">
-        <div><div class="fw-semibold" style="font-size:.88rem">${a.nome}</div><div class="sh-muted" style="font-size:.78rem">${a.materia}</div></div>
+    if (alunos.length === 0) { lista.innerHTML = '<p class="sh-muted mb-0" style="font-size:.85rem">Nenhum aluno inscrito nas suas matérias ainda.</p>'; return; }
+    lista.innerHTML = alunos.map((a, i) => `
+      <div class="d-flex align-items-center gap-2 py-2${i < alunos.length - 1 ? ' border-bottom' : ''}">
+        <img src="${a.temAvatar ? 'api/usuarios.php?acao=avatar&id=' + a.id : 'https://i.pravatar.cc/80?u=' + encodeURIComponent(a.email)}" class="sh-avatar">
+        <div><div class="fw-semibold" style="font-size:.88rem">${shEsc(a.nome)}</div><div class="sh-muted" style="font-size:.78rem">${shEsc(a.materia)}</div></div>
+        <a href="chat.html?tutor=${a.id}" class="btn btn-sh-outline btn-sm ms-auto">Conversar</a>
       </div>`).join('');
   }
-  renderAlunosProfessor();
+
+  function renderConteudosRecentes(materiais) {
+    const alvo = document.getElementById('lista-conteudos-recentes');
+    if (materiais.length === 0) { alvo.innerHTML = '<p class="sh-muted text-center py-3 mb-0" style="font-size:.85rem">Você ainda não publicou nenhum conteúdo.</p>'; return; }
+    alvo.innerHTML = '';
+    materiais.slice(0, 5).forEach((m, i, arr) => {
+      const div = document.createElement('div');
+      div.className = 'd-flex justify-content-between align-items-center py-2' + (i < arr.length - 1 ? ' border-bottom' : '');
+      div.innerHTML = `
+        <div class="d-flex align-items-center gap-2"><span class="sh-pill ${m.tipo === 'Vídeo' || m.tipo === 'Resumo' ? 'purple' : 'gray'}">${shEsc(m.tipo)}</span><span style="font-size:.9rem">${shEsc(m.titulo)}</span></div>
+        <span class="sh-muted" style="font-size:.8rem">${shEsc(shDataBR(m.criadoEm))} <i class="bi bi-trash text-danger ms-2" style="cursor:pointer" title="Excluir conteúdo" data-del-material="${m.id}"></i></span>`;
+      alvo.appendChild(div);
+    });
+    alvo.querySelectorAll('[data-del-material]').forEach(ic => ic.addEventListener('click', async function () {
+      if (!confirm('Excluir esse conteúdo?')) return;
+      if (shErroApi(await shApi('materiais.php', { acao: 'excluir', id: this.dataset.delMaterial, corpo: {} }))) return;
+      carregarTudo();
+    }));
+  }
+
+  async function carregarTudo() {
+    const eu = shGetUser();
+    const [m, al, mat, st] = await Promise.all([
+      shApi('materias.php', { acao: 'do_tutor' }), shApi('materias.php', { acao: 'alunos' }),
+      shApi('materiais.php'), shApi('usuarios.php', { acao: 'estatisticas' })
+    ]);
+    minhasMaterias = m.materias || [];
+    renderMateriasProfessor();
+    renderAlunosProfessor(al.alunos || []);
+    renderConteudosRecentes((mat.materiais || []).filter(x => x.tutorId === eu.id));
+    if (st.ok) {
+      document.getElementById('kpi-alunos-professor').textContent = st.alunos;
+      document.getElementById('kpi-materiais-professor').textContent = st.materiais;
+      document.getElementById('kpi-mensagens-professor').textContent = st.mensagens;
+    }
+  }
+  carregarTudo();
 
   // ==========================================================
   // Abas do painel: "Dashboard" mostra tudo junto (como sempre foi);

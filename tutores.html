@@ -60,11 +60,6 @@
     <input id="busca-tutor" class="form-control sh-search" style="max-width:320px" placeholder="Pesquisar tutores ou matérias...">
     <select id="filtro-materia-tutor" class="form-select sh-search" style="max-width:190px">
       <option value="todas">Todas as matérias</option>
-      <option value="Matemática">Matemática</option>
-      <option value="Português">Português</option>
-      <option value="Ciências">Ciências</option>
-      <option value="História">História</option>
-      <option value="Inglês">Inglês</option>
     </select>
     <select id="filtro-disponibilidade" class="form-select sh-search" style="max-width:190px">
       <option value="todos">Disponibilidade</option>
@@ -103,28 +98,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="app.js"></script>
 <script>
-  // ==========================================================
-  // Lista de tutores "de mentira" pra dar volume suficiente pra
-  // testar filtro + paginação de verdade. Quando o backend existir,
-  // isso vem de uma consulta ao banco (com LIMIT/OFFSET pra paginar).
-  // ==========================================================
-  const tutores = [
-    { nome: 'Lucas Oliveira', materia: 'Matemática', nota: 4.9, avals: 128, disp: true, foto: 12, desc: 'Professor de matemática com 8 anos de experiência. Ajudo alunos do fundamental ao ensino superior.' },
-    { nome: 'Juliana Santos', materia: 'Português', nota: 4.8, avals: 96, disp: true, foto: 32, desc: 'Especialista em redação e gramática. Vamos melhorar sua escrita e interpretação!' },
-    { nome: 'Rafael Costa', materia: 'Matemática', nota: 4.7, avals: 87, disp: true, foto: 51, desc: 'Aulas personalizadas de matemática para todos os níveis. Foco em resultados.' },
-    { nome: 'Carla Menezes', materia: 'Ciências', nota: 4.9, avals: 113, disp: true, foto: 47, desc: 'Bióloga e professora apaixonada por ensinar ciências de forma prática e divertida.' },
-    { nome: 'Rodrigo Alves', materia: 'História', nota: 4.6, avals: 54, disp: false, foto: 15, desc: 'Historiador com foco em Brasil Colônia e Era das Revoluções.' },
-    { nome: 'Fernanda Lopes', materia: 'Inglês', nota: 4.9, avals: 140, disp: true, foto: 25, desc: 'Aulas de conversação e gramática para todos os níveis, do básico ao avançado.' },
-    { nome: 'Beatriz Ramos', materia: 'Matemática', nota: 4.5, avals: 41, disp: true, foto: 9, desc: 'Aulas de reforço em álgebra e geometria para o ensino fundamental e médio.' },
-    { nome: 'Diego Martins', materia: 'Português', nota: 4.6, avals: 63, disp: false, foto: 22, desc: 'Foco em interpretação de texto e redação para vestibular e ENEM.' },
-    { nome: 'Camila Duarte', materia: 'Ciências', nota: 4.8, avals: 77, disp: true, foto: 44, desc: 'Química e Biologia com experimentos práticos explicados passo a passo.' },
-    { nome: 'Eduardo Nunes', materia: 'História', nota: 4.4, avals: 29, disp: true, foto: 6, desc: 'Especialista em história do Brasil e geopolítica contemporânea.' },
-    { nome: 'Larissa Prado', materia: 'Inglês', nota: 4.7, avals: 58, disp: false, foto: 36, desc: 'Preparação para provas de proficiência (TOEFL, IELTS) e inglês conversacional.' },
-    { nome: 'Thiago Rezende', materia: 'Matemática', nota: 4.8, avals: 102, disp: true, foto: 3, desc: 'Cálculo, trigonometria e preparação para o ENEM.' },
-    { nome: 'Patrícia Lima', materia: 'Português', nota: 4.9, avals: 88, disp: true, foto: 29, desc: 'Gramática descomplicada e produção textual para todas as idades.' },
-    { nome: 'Marcos Vieira', materia: 'Ciências', nota: 4.6, avals: 34, disp: false, foto: 18, desc: 'Física básica e experimentos de laboratório para o ensino médio.' }
-  ];
-
+  // Tutores aprovados, direto do servidor (api/usuarios.php?acao=tutores)
+  let tutores = [];
   const POR_PAGINA = 6;
   let paginaAtual = 1;
 
@@ -134,9 +109,10 @@
     const disp = document.getElementById('filtro-disponibilidade').value;
 
     return tutores.filter(t => {
-      const bateMateria = materia === 'todas' || t.materia === materia;
-      const bateBusca = !termo || t.nome.toLowerCase().includes(termo) || t.materia.toLowerCase().includes(termo);
-      const bateDisp = disp !== 'agora' || t.disp === true;
+      const nomesMat = t.materias.map(m => m.nome);
+      const bateMateria = materia === 'todas' || nomesMat.includes(materia);
+      const bateBusca = !termo || t.nome.toLowerCase().includes(termo) || nomesMat.some(n => n.toLowerCase().includes(termo));
+      const bateDisp = disp !== 'agora' || t.disponivel === true;
       return bateMateria && bateBusca && bateDisp;
     });
   }
@@ -156,23 +132,20 @@
     pagina.forEach(t => {
       const col = document.createElement('div');
       col.className = 'col-md-6 col-lg-4';
-      // Só temos conversa simulada com esses 4 tutores por enquanto; os demais
-      // abrem o chat geral (quando o backend existir, todo tutor terá conversa).
-      const idsConversaExistente = { 'Lucas Oliveira': 'lucas', 'Juliana Santos': 'juliana', 'Rafael Costa': 'rafael', 'Carla Menezes': 'carla' };
-      const linkChat = idsConversaExistente[t.nome] ? `chat.html?tutor=${idsConversaExistente[t.nome]}` : 'chat.html';
+      const linkChat = `chat.html?tutor=${t.id}`;
+      const materiasTxt = t.materias.map(m => m.nome).join(', ') || 'Tutor';
       col.innerHTML = `
-        <div class="sh-card p-3">
+        <div class="sh-card p-3 h-100 d-flex flex-column">
           <div class="d-flex gap-3">
-            <img src="https://i.pravatar.cc/100?img=${t.foto}" class="sh-avatar-lg">
+            <img src="${shEsc(t.avatar || 'https://i.pravatar.cc/100?u=' + t.id)}" class="sh-avatar-lg">
             <div>
-              <div class="fw-semibold">${t.nome}</div>
-              <div class="sh-muted" style="font-size:.85rem">${t.materia}</div>
-              <div style="font-size:.85rem"><i class="bi bi-star-fill text-warning"></i> ${t.nota} <span class="sh-muted">(${t.avals} avaliações)</span></div>
-              <span class="sh-pill ${t.disp ? '' : 'gray'} mt-1">${t.disp ? 'Disponível agora' : 'Indisponível no momento'}</span>
+              <div class="fw-semibold">${shEsc(t.nome)}</div>
+              <div class="sh-muted" style="font-size:.85rem">${shEsc(materiasTxt)}</div>
+              <span class="sh-pill ${t.disponivel ? '' : 'gray'} mt-1">${t.disponivel ? 'Disponível agora' : 'Indisponível no momento'}</span>
             </div>
           </div>
-          <p class="sh-muted mt-2 mb-2" style="font-size:.85rem">${t.desc}</p>
-          <button class="btn btn-sh-outline btn-sm w-100 btn-ver-perfil" data-chat="${linkChat}">Ver perfil</button>
+          <p class="sh-muted mt-2 mb-2" style="font-size:.85rem">${shEsc(t.bio || 'Tutor da plataforma StudyHelp.')}</p>
+          <button class="btn btn-sh-outline btn-sm w-100 btn-ver-perfil mt-auto" data-chat="${linkChat}">Ver perfil</button>
         </div>`;
       lista.appendChild(col);
     });
@@ -225,7 +198,14 @@
   document.getElementById('filtro-materia-tutor').addEventListener('change', function () { paginaAtual = 1; renderizarTutores(); });
   document.getElementById('filtro-disponibilidade').addEventListener('change', function () { paginaAtual = 1; renderizarTutores(); });
 
-  renderizarTutores();
+  async function iniciar() {
+    const [r, nomes] = await Promise.all([shApi('usuarios.php', { acao: 'tutores' }), shNomesMaterias()]);
+    tutores = r.tutores || [];
+    const sel = document.getElementById('filtro-materia-tutor');
+    sel.innerHTML = '<option value="todas">Todas as matérias</option>' + nomes.map(n => `<option value="${shEsc(n)}">${shEsc(n)}</option>`).join('');
+    renderizarTutores();
+  }
+  iniciar();
 </script>
 </body>
 </html>
