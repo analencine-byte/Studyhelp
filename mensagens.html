@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat / Suporte — StudyHelp</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+<style>
+  .chat-window { height: calc(100vh - 320px); min-height:240px; overflow-y:auto; }
+  .conversa-item { cursor:pointer; }
+  .conversa-item.ativa { background: var(--sh-green-pale); }
+</style>
+</head>
+<body>
+
+<nav class="sh-navbar">
+  <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <a href="index.html" class="sh-logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 6C10 4.5 6.5 4 3 4v13c3.5 0 7 .5 9 2 2-1.5 5.5-2 9-2V4c-3.5 0-7 .5-9 2Z" fill="#2E7D32"/></svg>
+      StudyHelp
+    </a>
+    <div class="d-none d-lg-flex gap-1">
+      <a href="index.html" class="sh-nav-link sh-link-inicio">Início</a>
+      <a href="materiais.html" class="sh-nav-link">Matérias</a>
+      <a href="mensagens.html" class="sh-nav-link active">Chat</a>
+    </div>
+    <div id="sh-nav-visitante" class="d-flex align-items-center gap-2">
+      <a href="login.html" class="btn btn-sh-outline btn-sm">Entrar</a>
+      <a href="login.html#cadastro" class="btn btn-sh-primary btn-sm">Cadastre-se</a>
+    </div>
+    <div id="sh-nav-logado" class="dropdown d-none">
+      <div class="d-flex align-items-center gap-2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="https://i.pravatar.cc/80?img=47" class="sh-avatar sh-user-avatar" style="width:36px;height:36px">
+        <span style="font-size:.9rem">Olá, <span class="sh-user-firstname">Ana</span></span>
+        <i class="bi bi-chevron-down sh-muted" style="font-size:.75rem"></i>
+      </div>
+      <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2" style="border-radius:12px;border-color:var(--sh-border)">
+        <li><a class="dropdown-item" href="perfil.html"><i class="bi bi-person me-2"></i>Meu perfil</a></li>
+        <li><a class="dropdown-item" href="perfil.html#config"><i class="bi bi-gear me-2"></i>Configurações</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-danger" href="index.html" onclick="shLogout()"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- VISITANTE: em vez de redirecionar sem avisar, mostra a tela de bloqueio explicando o motivo -->
+<div class="container mt-5 sh-somente-visitante">
+  <div class="sh-card p-5 text-center mx-auto" style="max-width:420px">
+    <i class="bi bi-lock-fill fs-1 mb-2" style="color:var(--sh-green-dark)"></i>
+    <h5 class="mb-2">Crie sua conta para continuar</h5>
+    <p class="sh-muted mb-3" style="font-size:.9rem">O chat com tutores e o suporte são exclusivos para quem tem conta no StudyHelp. Cadastre-se gratuitamente ou entre na sua conta.</p>
+    <div class="d-flex gap-2 justify-content-center">
+      <a href="login.html" class="btn btn-sh-outline btn-sm">Entrar</a>
+      <a href="login.html#cadastro" class="btn btn-sh-primary btn-sm">Cadastre-se</a>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt-3 px-4 sh-somente-logado">
+  <div class="row g-3">
+
+    <!-- LISTA DE CONVERSAS -->
+    <div class="col-md-4 col-lg-3">
+      <div class="sh-card p-3">
+        <input class="form-control sh-search mb-3" placeholder="Buscar conversas..." id="busca-conversa">
+        <div id="lista-conversas"></div>
+      </div>
+    </div>
+
+    <!-- JANELA DE CHAT -->
+    <div class="col-md-8 col-lg-9">
+      <div class="sh-card d-flex flex-column" style="height: calc(100vh - 130px)">
+        <div class="d-flex align-items-center gap-2 p-3 border-bottom">
+          <img id="chat-avatar" src="https://i.pravatar.cc/80?img=68" class="sh-avatar">
+          <div class="flex-grow-1">
+            <div class="fw-semibold" id="chat-nome">Conversas</div>
+            <div class="sh-muted" id="chat-status" style="font-size:.78rem"></div>
+          </div>
+          <i class="bi bi-info-circle sh-muted"></i>
+        </div>
+
+        <div class="chat-window p-3 flex-grow-1 d-flex flex-column gap-2" id="janela-mensagens"></div>
+
+        <input type="file" id="input-arquivo" class="d-none" accept=".pdf,.png,.jpg,.jpeg,.gif,.txt,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.mp4">
+        <form class="d-flex gap-2 p-3 border-top" id="form-mensagem">
+          <button type="button" class="btn btn-sh-outline btn-sm" id="btn-anexo"><i class="bi bi-paperclip"></i></button>
+          <input class="form-control sh-search" id="input-mensagem" placeholder="Digite sua mensagem...">
+          <button class="btn btn-sh-primary btn-sm" type="submit"><i class="bi bi-send-fill"></i></button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+<script>
+  // ==========================================================
+  // Chat de verdade: mensagens ficam no servidor (api/mensagens.php) e a tela
+  // atualiza sozinha a cada poucos segundos. Só os dois participantes
+  // enxergam a conversa. "Suporte StudyHelp" = conta do administrador.
+  // ==========================================================
+  let conversas = [];        // lista vinda do servidor
+  let conversaAtual = null;  // id do contato aberto
+  let mensagens = [];        // mensagens da conversa aberta
+  const AVATAR_PADRAO = 'https://i.pravatar.cc/80?img=68';
+
+  function tamanhoLegivel(b) { return b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
+
+  function renderizarListaConversas() {
+    const lista = document.getElementById('lista-conversas');
+    const termo = document.getElementById('busca-conversa').value.toLowerCase();
+    lista.innerHTML = '';
+    const visiveis = conversas.filter(c => !termo || c.nome.toLowerCase().includes(termo));
+    if (visiveis.length === 0) lista.innerHTML = '<p class="sh-muted text-center mb-0 py-3" style="font-size:.82rem">Nenhuma conversa ainda.</p>';
+    visiveis.forEach(c => {
+      const previa = !c.ultima ? 'Comece a conversa' : (c.ultima.texto ? c.ultima.texto : '📎 ' + c.ultima.arquivo.nome);
+      const div = document.createElement('div');
+      div.className = 'd-flex align-items-center gap-2 p-2 mt-1 rounded-3 conversa-item' + (c.id === conversaAtual ? ' ativa' : '');
+      div.style.cursor = 'pointer';
+      div.innerHTML = (c.suporte
+        ? '<div class="sh-icon-badge purple"><i class="bi bi-headset"></i></div>'
+        : '<img src="' + shEsc(c.avatar || 'https://i.pravatar.cc/80?u=' + c.id) + '" class="sh-avatar">') + `
+        <div class="flex-grow-1" style="min-width:0">
+          <div class="fw-semibold" style="font-size:.9rem">${shEsc(c.nome)}</div>
+          <div class="sh-muted text-truncate" style="font-size:.78rem;max-width:150px">${shEsc(previa)}</div>
+        </div>` + (c.naoLidas ? '<span class="badge rounded-pill" style="background:var(--sh-green-dark)">' + c.naoLidas + '</span>' : '');
+      div.addEventListener('click', () => abrirConversa(c.id));
+      lista.appendChild(div);
+    });
+  }
+
+  function renderizarMensagens() {
+    const janela = document.getElementById('janela-mensagens');
+    const noFim = janela.scrollHeight - janela.scrollTop - janela.clientHeight < 80;
+    janela.innerHTML = '';
+    if (mensagens.length === 0) janela.innerHTML = '<p class="sh-muted text-center my-auto" style="font-size:.85rem">Nenhuma mensagem ainda. Diga oi! 👋</p>';
+    mensagens.forEach(m => {
+      if (m.arquivo) {
+        const a = document.createElement('a');
+        a.href = m.arquivo.url; a.target = '_blank'; a.rel = 'noopener';
+        a.className = (m.de === 'eu' ? 'align-self-end' : 'align-self-start') + ' d-flex align-items-center gap-2 sh-card p-2 text-reset text-decoration-none';
+        a.style.maxWidth = '70%';
+        a.innerHTML = `<i class="bi bi-file-earmark-arrow-down-fill fs-4" style="color:var(--sh-green-dark)"></i>
+          <div><div class="fw-semibold" style="font-size:.85rem">${shEsc(m.arquivo.nome)}</div>
+          <div class="sh-muted" style="font-size:.75rem">${tamanhoLegivel(m.arquivo.tamanho)}</div></div>`;
+        janela.appendChild(a);
+      }
+      if (m.texto) {
+        const div = document.createElement('div');
+        div.className = m.de === 'eu' ? 'align-self-end sh-chat-bubble-me' : 'align-self-start sh-chat-bubble-other';
+        div.title = shHora(m.criadoEm);
+        div.textContent = m.texto;
+        janela.appendChild(div);
+      }
+    });
+    if (noFim) janela.scrollTop = janela.scrollHeight;
+  }
+
+  async function carregarConversas(com) {
+    const r = await shApi('mensagens.php', { acao: 'conversas', params: com ? { com } : {} });
+    if (r.ok) { conversas = r.conversas; renderizarListaConversas(); }
+    return r.ok;
+  }
+
+  async function abrirConversa(id) {
+    conversaAtual = id;
+    const c = conversas.find(x => x.id === id);
+    if (!c) return;
+    document.getElementById('chat-nome').textContent = c.nome;
+    document.getElementById('chat-status').innerHTML = c.suporte
+      ? '<span class="text-success">●</span> Sempre disponível'
+      : `<span class="${c.online ? 'text-success' : 'text-secondary'}">●</span> ${c.online ? 'Online agora' : 'Offline'}${c.materia ? ' · ' + shEsc(c.materia) : ''}`;
+    document.getElementById('chat-avatar').src = c.avatar || (c.suporte ? AVATAR_PADRAO : 'https://i.pravatar.cc/80?u=' + c.id);
+    mensagens = [];
+    document.getElementById('janela-mensagens').scrollTop = 0;
+    const r = await shApi('mensagens.php', { acao: 'mensagens', params: { com: id } });
+    if (conversaAtual !== id) return;
+    mensagens = r.mensagens || [];
+    c.naoLidas = 0;
+    renderizarMensagens(); renderizarListaConversas();
+    const j = document.getElementById('janela-mensagens'); j.scrollTop = j.scrollHeight;
+  }
+
+  // Atualização automática (só enquanto a aba está aberta)
+  async function atualizar() {
+    if (document.hidden) return;
+    await carregarConversas();
+    if (!conversaAtual) return;
+    const ultimo = mensagens.length ? mensagens[mensagens.length - 1].id : 0;
+    const r = await shApi('mensagens.php', { acao: 'mensagens', params: { com: conversaAtual, depois: ultimo } });
+    if (r.ok && r.mensagens.length) { mensagens = mensagens.concat(r.mensagens); renderizarMensagens(); }
+  }
+
+  async function enviar(texto, arquivo) {
+    if (!conversaAtual) return;
+    let r;
+    if (arquivo) {
+      const fd = new FormData();
+      fd.append('para', conversaAtual);
+      if (texto) fd.append('texto', texto);
+      fd.append('arquivo', arquivo);
+      r = await shApi('mensagens.php', { acao: 'enviar', form: fd });
+    } else {
+      // só texto: vai como JSON (mesmo formato do login, que funciona na hospedagem)
+      r = await shApi('mensagens.php', { acao: 'enviar', corpo: { para: conversaAtual, texto } });
+    }
+    if (shErroApi(r)) return false;
+    mensagens.push(r.mensagem);
+    renderizarMensagens();
+    const j = document.getElementById('janela-mensagens'); j.scrollTop = j.scrollHeight;
+    carregarConversas();
+    return true;
+  }
+
+  document.getElementById('form-mensagem').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const input = document.getElementById('input-mensagem');
+    const texto = input.value.trim();
+    if (!texto) return;
+    input.value = '';
+    if (!(await enviar(texto, null))) input.value = texto;
+  });
+
+  document.getElementById('btn-anexo').addEventListener('click', () => document.getElementById('input-arquivo').click());
+  document.getElementById('input-arquivo').addEventListener('change', async function () {
+    const arquivo = this.files[0];
+    this.value = '';
+    if (arquivo) await enviar('', arquivo);
+  });
+  document.getElementById('busca-conversa').addEventListener('input', renderizarListaConversas);
+
+  async function iniciar() {
+    if (!shEstaLogado()) return; // visitante vê só a tela de bloqueio
+    const p = new URLSearchParams(window.location.search);
+    const pedido = parseInt(p.get('tutor') || p.get('com') || '', 10) || 0;
+    if (!(await carregarConversas(pedido || undefined))) return;
+    const alvo = conversas.find(c => c.id === pedido) || conversas[0];
+    if (alvo) abrirConversa(alvo.id);
+    else document.getElementById('chat-nome').textContent = 'Nenhuma conversa';
+    setInterval(atualizar, 4000);
+  }
+  iniciar();
+</script>
+</body>
+</html>

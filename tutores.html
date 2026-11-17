@@ -132,7 +132,7 @@
     pagina.forEach(t => {
       const col = document.createElement('div');
       col.className = 'col-md-6 col-lg-4';
-      const linkChat = `chat.html?tutor=${t.id}`;
+      const linkChat = `mensagens.html?tutor=${t.id}`;
       const materiasTxt = t.materias.map(m => m.nome).join(', ') || 'Tutor';
       col.innerHTML = `
         <div class="sh-card p-3 h-100 d-flex flex-column">
@@ -145,15 +145,14 @@
             </div>
           </div>
           <p class="sh-muted mt-2 mb-2" style="font-size:.85rem">${shEsc(t.bio || 'Tutor da plataforma StudyHelp.')}</p>
-          <button class="btn btn-sh-outline btn-sm w-100 btn-ver-perfil mt-auto" data-chat="${linkChat}">Ver perfil</button>
+          <button class="btn btn-sh-outline btn-sm w-100 btn-ver-perfil mt-auto" data-perfil="tutor.html?id=${t.id}">Ver perfil</button>
         </div>`;
       lista.appendChild(col);
     });
 
     lista.querySelectorAll('.btn-ver-perfil').forEach(btn => {
       btn.addEventListener('click', function () {
-        if (!shExigirLoginParaAcao()) return;
-        window.location.href = this.dataset.chat;
+        window.location.href = this.dataset.perfil;
       });
     });
 

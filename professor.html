@@ -53,7 +53,7 @@
     <a href="#" class="sh-side-link active mb-1 sh-side-tab" data-view="dashboard"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
     <a href="#" class="sh-side-link mb-1 sh-side-tab" data-view="materias"><i class="bi bi-journal-text"></i> Minhas matérias</a>
     <a href="#" class="sh-side-link mb-1 sh-side-tab" data-view="publicar"><i class="bi bi-cloud-upload"></i> Publicar material</a>
-    <a href="chat.html" class="sh-side-link mb-1"><i class="bi bi-chat-dots"></i> Fórum / Chat</a>
+    <a href="mensagens.html" class="sh-side-link mb-1"><i class="bi bi-chat-dots"></i> Fórum / Chat</a>
     <a href="#" class="sh-side-link mb-1 sh-side-tab" data-view="alunos"><i class="bi bi-people"></i> Alunos</a>
     <a href="perfil.html" class="sh-side-link mb-1"><i class="bi bi-person"></i> Perfil</a>
     <hr>
@@ -313,7 +313,7 @@
       <div class="d-flex align-items-center gap-2 py-2${i < alunos.length - 1 ? ' border-bottom' : ''}">
         <img src="${a.temAvatar ? 'api/usuarios.php?acao=avatar&id=' + a.id : 'https://i.pravatar.cc/80?u=' + encodeURIComponent(a.email)}" class="sh-avatar">
         <div><div class="fw-semibold" style="font-size:.88rem">${shEsc(a.nome)}</div><div class="sh-muted" style="font-size:.78rem">${shEsc(a.materia)}</div></div>
-        <a href="chat.html?tutor=${a.id}" class="btn btn-sh-outline btn-sm ms-auto">Conversar</a>
+        <a href="mensagens.html?tutor=${a.id}" class="btn btn-sh-outline btn-sm ms-auto">Conversar</a>
       </div>`).join('');
   }
 

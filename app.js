@@ -346,7 +346,7 @@ function shAbrirAtividade(a) {
   const acao = document.getElementById('sh-ma-acao');
   let href = 'materiais.html' + (a.materia ? '?materia=' + encodeURIComponent(a.materia) : ''), txt = 'Ver material';
   if (a.tipo === 'caderno') { href = 'cadernos.html'; txt = a.status === 'Em andamento' ? 'Continuar atividade' : 'Abrir caderno'; }
-  else if (a.tipo === 'duvida' && a.tutor) { href = 'chat.html?tutor=' + a.tutor; txt = a.status === 'Em andamento' ? 'Continuar conversa' : 'Ver resposta'; }
+  else if (a.tipo === 'duvida' && a.tutor) { href = 'mensagens.html?tutor=' + a.tutor; txt = a.status === 'Em andamento' ? 'Continuar conversa' : 'Ver resposta'; }
   else if (a.status === 'Em andamento') txt = 'Continuar atividade';
   if (a.tipo === 'avaliacao') { acao.classList.add('d-none'); } else { acao.classList.remove('d-none'); acao.href = href; acao.textContent = txt; }
   bootstrap.Modal.getOrCreateInstance(modal).show();

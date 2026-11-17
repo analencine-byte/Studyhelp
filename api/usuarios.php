@@ -1,6 +1,7 @@
 <?php
 // GET  usuarios.php                        (admin) lista usuários
 // GET  usuarios.php?acao=tutores           (público) tutores aprovados, com matérias
+// GET  usuarios.php?acao=tutor&id=N        (público) perfil do tutor: bio, matérias e materiais publicados
 // GET  usuarios.php?acao=avatar&id=N       (público) imagem de perfil
 // GET  usuarios.php?acao=estatisticas      (logado) números do painel do aluno/tutor
 // POST usuarios.php?acao=status&id=N       (admin) {status}
@@ -37,6 +38,23 @@ if ($acao === 'tutores') {
         $saida[] = $p;
     }
     responder(['tutores' => $saida]);
+}
+
+if ($acao === 'tutor') {
+    $st = db()->prepare("SELECT id,nome,email,papel,status,avatar,bio,disponivel,config,criado_em FROM usuarios
+        WHERE id = ? AND papel = 'Tutor' AND status IN ('Aprovado','Ativo')");
+    $st->execute([(int)($_GET['id'] ?? 0)]);
+    $t = $st->fetch();
+    if (!$t) erro('Tutor não encontrado.', 404);
+    $p = usuarioPublico($t);
+    unset($p['email'], $p['config']);
+    $m = db()->prepare('SELECT id, nome, descricao FROM materias WHERE tutor_id = ? ORDER BY nome'); $m->execute([$t['id']]);
+    $p['materias'] = array_map(fn($r) => ['id' => (int)$r['id'], 'nome' => $r['nome'], 'descricao' => $r['descricao']], $m->fetchAll());
+    $x = db()->prepare('SELECT x.id, x.titulo, x.tipo, x.criado_em AS criadoEm, m.nome AS materia
+        FROM materiais x JOIN materias m ON m.id = x.materia_id WHERE x.tutor_id = ? ORDER BY x.criado_em DESC, x.id DESC');
+    $x->execute([$t['id']]);
+    $p['materiais'] = array_map(fn($r) => ['id' => (int)$r['id'], 'titulo' => $r['titulo'], 'tipo' => $r['tipo'], 'criadoEm' => $r['criadoEm'], 'materia' => $r['materia']], $x->fetchAll());
+    responder(['tutor' => $p]);
 }
 
 if ($acao === 'estatisticas') {

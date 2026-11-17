@@ -38,7 +38,7 @@
         </div>
         <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2" style="border-radius:12px;border-color:var(--sh-border)">
           <li><a class="dropdown-item" href="perfil.html"><i class="bi bi-person me-2"></i>Meu perfil</a></li>
-          <li><a class="dropdown-item" href="chat.html"><i class="bi bi-chat-dots me-2"></i>Chat / Suporte</a></li>
+          <li><a class="dropdown-item" href="mensagens.html"><i class="bi bi-chat-dots me-2"></i>Chat / Suporte</a></li>
           <li><a class="dropdown-item" href="cadernos.html"><i class="bi bi-journal-bookmark me-2"></i>Meus cadernos</a></li>
           <li><a class="dropdown-item" href="perfil.html#config"><i class="bi bi-gear me-2"></i>Configurações</a></li>
           <li><hr class="dropdown-divider"></li>
@@ -186,7 +186,7 @@
           <div class="fw-semibold" style="font-size:.9rem">${shEsc(t.nome)}</div>
           <div class="sh-muted" style="font-size:.8rem">${shEsc(t.materias.map(m => m.nome).join(', ') || 'Tutor')}</div>
         </div>
-        <a href="chat.html?tutor=${t.id}" class="btn btn-sh-outline btn-sm">Conversar</a>
+        <a href="mensagens.html?tutor=${t.id}" class="btn btn-sh-outline btn-sm">Conversar</a>
       </div>`).join('') : '<p class="sh-muted mb-0" style="font-size:.85rem">Nenhum tutor disponível no momento.</p>';
 
     // cadernos (até 3)

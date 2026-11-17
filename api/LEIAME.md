@@ -29,7 +29,7 @@ Se o MySQL tiver senha, ajuste `api/config.php` (ou use as variáveis `SH_DB_USE
 | `materiais.php` | listar (público), ver/baixar (logado), publicar com arquivo e excluir (tutor) |
 | `tarefas.php` | atividades do aluno e envio de dúvidas (a dúvida vai pro chat do tutor da matéria) |
 | `cadernos.php` | cadernos do aluno (cada um só vê os seus) |
-| `chat.php` | conversas aluno↔tutor e suporte; anexos; só quem participa lê |
+| `mensagens.php` | conversas aluno↔tutor e suporte; anexos; só quem participa lê |
 | `notificacoes.php` | notificações (mensagens novas, materiais novos, inscrições, solicitações) |
 | `configuracoes.php` | configurações da plataforma (admin) |
 | `atividades.php` | histórico de atividades da plataforma (admin) |
@@ -39,7 +39,7 @@ Se o MySQL tiver senha, ajuste `api/config.php` (ou use as variáveis `SH_DB_USE
 - Ninguém vira administrador pelo cadastro; tutor novo fica "Pendente" até o admin aprovar (configurável).
 - Trocar email/senha exige a senha atual. Mensagens de login não revelam se o email existe.
 - Uploads: só extensões permitidas, nome aleatório, pasta `api/uploads` bloqueada por `.htaccess`;
-  os arquivos só saem por `materiais.php`/`chat.php`, depois de checar login e permissão.
+  os arquivos só saem por `materiais.php`/`mensagens.php`, depois de checar login e permissão.
 - Todo texto vindo do banco é escapado antes de ir pra tela (contra injeção de HTML).
 - Limite de upload vem do `php.ini` (`upload_max_filesize` / `post_max_size`; no XAMPP o padrão é 40 MB).
 

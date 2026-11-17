@@ -221,6 +221,9 @@
     const pedida = new URLSearchParams(window.location.search).get('materia');
     if (pedida && lista.includes(pedida)) filtroMateria.value = pedida;
     desenharMateriais();
+    // Chegou pelo perfil de um tutor (materiais.html?abrir=ID): abre o material direto
+    const abrir = parseInt(new URLSearchParams(window.location.search).get('abrir') || '', 10);
+    if (abrir) abrirMaterial(abrir);
   }
   iniciar();
 </script>
